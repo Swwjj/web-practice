@@ -5,16 +5,16 @@ import java.time.LocalDateTime;
 
 public class OrderItem {
     private Integer id;
-    private Integer uid;
-    private Integer orderId;
-    private Integer goodsId;
-    private String goodsName;
-    private String iconUrl;
-    private BigDecimal price;
-    private Integer quantity;
-    private BigDecimal totalPrice;
-    private LocalDateTime created;
-    private LocalDateTime updated;
+    private Integer uid;        // 用户ID
+    private Integer orderId;    // 订单ID
+    private Integer goodsId;    // 商品ID
+    private String goodsName;   // 商品名称
+    private String iconUrl;     // 商品图标URL
+    private BigDecimal price;   // 商品单价
+    private Integer quantity;   // 商品数量
+    private BigDecimal totalPrice; // 商品总价
+    private LocalDateTime created; // 创建时间
+    private LocalDateTime updated; // 更新时间
 
     // 无参构造函数
     public OrderItem() {

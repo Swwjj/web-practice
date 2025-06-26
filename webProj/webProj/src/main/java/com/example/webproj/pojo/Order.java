@@ -2,22 +2,26 @@ package com.example.webproj.pojo;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Order {
     private Integer id;
-    private Long orderNo;
-    private Integer aid;
-    private Integer addrId;
-    private BigDecimal amount;
-    private Integer type;
-    private Integer freight;
-    private Integer status;
-    private LocalDateTime paymentTime;
-    private LocalDateTime deliveryTime;
-    private LocalDateTime finishTime;
-    private LocalDateTime closeTime;
-    private LocalDateTime created;
-    private LocalDateTime updated;
+    private Long orderNo;       // 订单编号
+    private Integer uid;        // 支付方式ID
+    private Integer addrId;     // 收货地址ID
+    private BigDecimal amount;  // 订单总金额
+    private Integer type;       // 支付类型
+    private Integer freight;    // 运费
+    private Integer status;     // 订单状态
+    private LocalDateTime paymentTime; // 支付时间
+    private LocalDateTime deliveryTime; // 发货时间
+    private LocalDateTime finishTime; // 完成时间
+    private LocalDateTime closeTime; // 关闭时间
+    private LocalDateTime created; // 创建时间
+    private LocalDateTime updated; // 更新时间
+
+    private List<OrderItem> orderItems;
+    private Address address; // 收货地址
 
     // 无参构造函数
     public Order() {
@@ -27,10 +31,10 @@ public class Order {
     public Order(Integer id, Long orderNo, Integer aid, Integer addrId, BigDecimal amount,
                  Integer type, Integer freight, Integer status, LocalDateTime paymentTime,
                  LocalDateTime deliveryTime, LocalDateTime finishTime, LocalDateTime closeTime,
-                 LocalDateTime created, LocalDateTime updated) {
+                 LocalDateTime created, LocalDateTime updated, List<OrderItem> orderItems) {
         this.id = id;
         this.orderNo = orderNo;
-        this.aid = aid;
+        this.uid = aid;
         this.addrId = addrId;
         this.amount = amount;
         this.type = type;
@@ -42,6 +46,7 @@ public class Order {
         this.closeTime = closeTime;
         this.created = created;
         this.updated = updated;
+        this.orderItems = orderItems;
     }
 
     // Getter 和 Setter 方法
@@ -62,11 +67,11 @@ public class Order {
     }
 
     public Integer getAid() {
-        return aid;
+        return uid;
     }
 
-    public void setAid(Integer aid) {
-        this.aid = aid;
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
     public Integer getAddrId() {
@@ -172,7 +177,7 @@ public class Order {
         return "Order{" +
                 "id=" + id +
                 ", orderNo=" + orderNo +
-                ", aid=" + aid +
+                ", uid=" + uid +
                 ", addrId=" + addrId +
                 ", amount=" + amount +
                 ", type=" + type +
@@ -185,5 +190,21 @@ public class Order {
                 ", created=" + created +
                 ", updated=" + updated +
                 '}';
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+    // 并提供 getter 和 setter
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }
