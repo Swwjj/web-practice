@@ -3,6 +3,7 @@ package com.example.webproj.controller;
 import com.example.webproj.pojo.ProductType;
 import com.example.webproj.service.ProductTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,17 +18,61 @@ public class ProductTypeController {
     private ProductTypeService productTypeService;
 
     /**
-     * 删除配件类型参数接口
-     * @param id 产品类型ID
-     * @return 结果
+     * 递归获取产品类型数据接口(前端接口)
+     * 该接口用于前台获取产品参数的数据。
      */
-    @PostMapping("/delparam.do")
-    public Map<String, Object> deleteParam(@RequestParam String id) {
+    @GetMapping("/findallparams.do")
+    public Map<String, Object> findAllParams() {
         Map<String, Object> result = new HashMap<>();
         try {
-            boolean hasChildren = productTypeService.hasChildren(Integer.parseInt(id));
-            boolean hasProducts = productTypeService.hasProducts(Integer.parseInt(id));
+            List<ProductType> productTypes = productTypeService.findAllParams();
+            if (productTypes.isEmpty()) {
+                result.put("status", 1);
+                result.put("msg", "没有有效的产品类型数据");
+            } else {
+                result.put("status", 0);
+                result.put("data", productTypes);
+            }
+        } catch (Exception e) {
+            result.put("status", 1);
+            result.put("msg", "查询失败：" + e.getMessage());
+        }
+        return result;
+    }
 
+    /**
+     * 删除配件类型参数接口
+     * @param formId 产品类型ID
+     * @return 结果
+     */
+    @PostMapping(value = "/delparam.do", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public Map<String, Object> deleteParam(
+            @RequestBody(required = false) Map<String, String> jsonBody,
+            @RequestParam(value = "id", required = false) String formId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            // 从 form-urlencoded 或 JSON 中提取 id
+            String id = formId != null ? formId : (jsonBody != null ? jsonBody.get("id") : null);
+            if (id == null || id.trim().isEmpty()) {
+                result.put("status", 1);
+                result.put("msg", "ID 不能为空");
+                return result;
+            }
+            Integer parsedId;
+            try {
+                parsedId = Integer.parseInt(id);
+                if (parsedId <= 0) {
+                    result.put("status", 1);
+                    result.put("msg", "ID 必须为正整数");
+                    return result;
+                }
+            } catch (NumberFormatException e) {
+                result.put("status", 1);
+                result.put("msg", "ID 格式无效：必须为数字");
+                return result;
+            }
+            boolean hasChildren = productTypeService.hasChildren(parsedId);
+            boolean hasProducts = productTypeService.hasProducts(parsedId);
             if (hasChildren) {
                 result.put("status", 1);
                 result.put("msg", "请先删除子类型！");
@@ -35,16 +80,19 @@ public class ProductTypeController {
                 result.put("status", 1);
                 result.put("msg", "不能删除有商品的类型！");
             } else {
-                productTypeService.deleteParam(Integer.parseInt(id));
+                productTypeService.deleteParam(parsedId);
                 result.put("status", 0);
+                result.put("msg", "删除成功");
             }
+        } catch (IllegalArgumentException e) {
+            result.put("status", 1);
+            result.put("msg", e.getMessage());
         } catch (Exception e) {
             result.put("status", 1);
-            result.put("msg", "删除失败！");
+            result.put("msg", "删除失败：" + e.getMessage());
         }
         return result;
     }
-
     /**
      * 获取带路径的参数信息接口
      * @return 结果
@@ -121,12 +169,13 @@ public class ProductTypeController {
 
     /**
      * 产品参数更新接口
-     * @param id 产品参数ID
-     * @param name 产品参数名称
+     * @param params 产品参数ID
      * @return 结果
      */
     @PostMapping("/updateparam.do")
-    public Map<String, Object> updateParam(@RequestParam String id, @RequestParam String name) {
+    public Map<String, Object> updateParam(@RequestBody Map<String, String> params) {
+        String id = params.get("id");
+        String name = params.get("name");
         Map<String, Object> result = new HashMap<>();
         try {
             if (id == null || name == null) {
@@ -142,6 +191,7 @@ public class ProductTypeController {
             result.put("status", 0);
             result.put("msg", "产品参数修改成功！");
         } catch (Exception e) {
+            System.out.println(e);
             result.put("status", 1);
             result.put("msg", "产品参数修改失败！");
         }
@@ -150,13 +200,16 @@ public class ProductTypeController {
 
     /**
      * 产品类型新增接口
-     * @param name 产品参数类型
-     * @param parentId 父类型ID
-     * @param sortOrder 序号
+     *  name 产品参数类型
+     *  parentId 父类型ID
+     *  sortOrder 序号
      * @return 结果
      */
     @PostMapping("/saveparam.do")
-    public Map<String, Object> saveParam(@RequestParam String name, @RequestParam String parentId, @RequestParam String sortOrder) {
+    public Map<String, Object> saveParam(@RequestBody Map<String, String> params) {
+        String name = params.get("name");
+        String parentId = params.get("parentId");
+        String sortOrder = params.get("sortOrder");
         Map<String, Object> result = new HashMap<>();
         try {
             if (name == null || parentId == null || sortOrder == null) {
@@ -175,9 +228,13 @@ public class ProductTypeController {
             result.put("status", 0);
             result.put("msg", "产品参数新增成功！");
         } catch (Exception e) {
+            System.out.println(e);
             result.put("status", 1);
             result.put("msg", "产品参数新增失败！");
         }
         return result;
     }
+
+    
 }
+

@@ -15,6 +15,30 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     private ProductTypeMapper productTypeMapper;
 
     @Override
+    public List<ProductType> findAllParams() {
+        // 查询顶级节点（parent_id = 0）
+        List<ProductType> topLevelTypes = productTypeMapper.findChildren(0);
+        // 递归构建树形结构
+        for (ProductType type : topLevelTypes) {
+            buildTree(type);
+        }
+        return topLevelTypes;
+    }
+
+    // 递归构建树形结构
+    private void buildTree(ProductType parent) {
+        // 查询子节点
+        List<ProductType> children = productTypeMapper.findChildren(parent.getId());
+        // 设置子节点
+        parent.setChildren(children);
+        // 递归处理每个子节点
+        for (ProductType child : children) {
+            buildTree(child);
+        }
+    }
+
+
+    @Override
     public boolean hasChildren(Integer id) {
         return productTypeMapper.countChildren(id) > 0;
     }
@@ -52,14 +76,28 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class) // 明确指定异常回滚
     public void updateParam(ProductType productType) {
-        productTypeMapper.update(productType);
+        // 1. 检查ID是否存在
+        ProductType existing = productTypeMapper.selectById(productType.getId());
+        if (existing == null) {
+            throw new IllegalArgumentException("ID不存在");
+        }
+
+        // 2. 更新时间并执行更新
+        productType.updateTime();
+        int affectedRows = productTypeMapper.update(productType);
+
+        // 3. 验证影响行数
+        if (affectedRows == 0) {
+            throw new RuntimeException("更新失败，记录可能不存在或数据未变化");
+        }
     }
 
     @Override
     @Transactional
     public void saveParam(ProductType productType) {
+        productType.initCreateTime(); // 初始化时间
         productTypeMapper.insert(productType);
     }
 }

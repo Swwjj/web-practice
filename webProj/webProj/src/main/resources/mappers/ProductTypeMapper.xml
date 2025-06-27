@@ -2,6 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.webproj.mappers.ProductTypeMapper">
 
+    <select id="findAll" resultType="com.example.webproj.pojo.ProductType">
+        SELECT * FROM product_type WHERE status = 1 ORDER BY sort_order
+    </select>
+
     <select id="countChildren" parameterType="int" resultType="int">
         SELECT COUNT(*) FROM product_type WHERE parent_id = #{id}
     </select>
@@ -27,17 +31,21 @@
     </select>
 
     <select id="findChildren" resultType="com.example.webproj.pojo.ProductType" parameterType="int">
-        SELECT * FROM product_type WHERE parent_id = #{id} AND status = 1
+        SELECT * FROM product_type WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order
     </select>
 
     <update id="update" parameterType="com.example.webproj.pojo.ProductType">
         UPDATE product_type
-        SET name = #{name}, updated = #{updated}
+        SET name = #{name}, updated = FROM_UNIXTIME(#{updated}/1000)
         WHERE id = #{id}
     </update>
 
     <insert id="insert" parameterType="com.example.webproj.pojo.ProductType">
         INSERT INTO product_type (parent_id, name, sort_order, status, level, created, updated)
-        VALUES (#{parentId}, #{name}, #{sortOrder}, #{status}, #{level}, #{created}, #{updated})
+        VALUES (#{parentId}, #{name}, #{sortOrder}, #{status}, #{level}, FROM_UNIXTIME(#{created}/1000), FROM_UNIXTIME(#{updated}/1000))
     </insert>
+
+    <select id="selectById" resultType="com.example.webproj.pojo.ProductType">
+        SELECT * FROM product_type WHERE id = #{id}
+    </select>
 </mapper>

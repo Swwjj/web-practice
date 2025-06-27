@@ -4,6 +4,7 @@ import com.example.webproj.pojo.ProductType;
 import java.util.List;
 
 public interface ProductTypeService {
+    List<ProductType> findAllParams(); // 递归查询所有产品类型
     boolean hasChildren(Integer id);
     boolean hasProducts(Integer id);
     void deleteParam(Integer id);
