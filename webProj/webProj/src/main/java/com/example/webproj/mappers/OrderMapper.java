@@ -11,15 +11,13 @@ import java.util.List;
 
 @Mapper
 public interface OrderMapper {
+
+    int getOrderCount();
     /* ============ 管理端 ============ */
     List<Order> findOrdersNoPages(@Param("orderNo") Long orderNo);
 
     List<Order> findOrdersPaging(@Param("offset") int offset,
                                  @Param("size")   int size);
-
-    List<Order> searchOrders(@Param("orderNo") Long orderNo,
-                             @Param("offset")  int  offset,
-                             @Param("size")    int  size);
 
     Order getDetailByOrderNo(@Param("orderNo") Long orderNo);
 

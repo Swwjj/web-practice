@@ -12,7 +12,7 @@ public interface OrderService {
 
     PageResult<Order> findOrdersPaging(int pageNum, int pageSize);
 
-    PageResult<Order> searchOrders(Long orderNo, int pageNum, int pageSize);
+    List<Order> searchOrders(Long orderNo, int pageNum, int pageSize);
 
     Order getDetail(Long orderNo);
 
@@ -24,7 +24,7 @@ public interface OrderService {
 
     Order createOrder(Integer uid, Integer addrId);
 
-    void confirmReceipt(Integer uid, Long orderNo);
+    void confirmReceipt(Long orderNo);
 
     void cancelOrder(Integer uid, Long orderNo);
 }

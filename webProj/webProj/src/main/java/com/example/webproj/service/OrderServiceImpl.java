@@ -32,17 +32,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageResult<Order> findOrdersPaging(int pageNum, int pageSize) {
+        int orderNum = orderMapper.getOrderCount();
         int offset = (pageNum - 1) * pageSize;
         List<Order> list = orderMapper.findOrdersPaging(offset, pageSize);
-        // 真实项目中需要再查 count(*)，此处示例直接给 list.size()
-        return new PageResult<>(pageNum, pageSize, list.size(), list);
+        return new PageResult<>(pageNum, pageSize, orderNum, list);
     }
 
     @Override
-    public PageResult<Order> searchOrders(Long orderNo, int pageNum, int pageSize) {
-        int offset = (pageNum - 1) * pageSize;
-        List<Order> list = orderMapper.searchOrders(orderNo, offset, pageSize);
-        return new PageResult<>(pageNum, pageSize, list.size(), list);
+    public List<Order> searchOrders(Long orderNo, int pageNum, int pageSize) {
+        return orderMapper.findOrdersNoPages(orderNo);
     }
 
     @Override
@@ -83,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void confirmReceipt(Integer uid, Long orderNo) {
+    public void confirmReceipt(Long orderNo) {
         // 仅允许本人且订单已发货
         orderMapper.updateOrderStatus(orderNo, 5, LocalDateTime.now());
     }

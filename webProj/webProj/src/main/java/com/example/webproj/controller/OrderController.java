@@ -21,7 +21,7 @@ public class OrderController {
 
     public OrderController(OrderService orderService, HttpSession session) {
         this.orderService = orderService;
-        this.session      = session;
+        this.session = session;
     }
 
     /* =======================================================
@@ -30,33 +30,78 @@ public class OrderController {
 
     /** 管理端：订单列表（不分页） */
     @GetMapping("/mgr/order/findorders_nopages.do")
-    public List<Order> mgrListNoPages(@RequestParam(required = false) Long orderNo) {
-        // TODO: 判断是否为管理员
-        return orderService.findOrdersNoPages(orderNo);
-    }
-
-    /** 管理端：订单列表（分页） */
-    @PostMapping("/mgr/order/findorders.do")
-    public PageResult<Order> mgrListPaging(@RequestParam(defaultValue = "1")  int pageNum,
-                                           @RequestParam(defaultValue = "10") int pageSize) {
-        // TODO: 判断是否为管理员
-        return orderService.findOrdersPaging(pageNum, pageSize);
+    public Map<String, Object> mgrListNoPages(@RequestParam(required = false) Long orderNo) {
+        Map<String, Object> result= new HashMap<>();
+        List<Order>orders = orderService.findOrdersNoPages(orderNo);
+        if(orders!=null)
+        {
+            result.put("status", 0);
+            result.put("data", orders);
+            return result;
+        }
+        result.put("status", 1);
+        result.put("msg", "没有订单信息");
+        return result;
     }
 
     /** 管理端：根据订单号分页搜索 */
     @GetMapping("/mgr/order/search.do")
-    public PageResult<Order> mgrSearch(@RequestParam Long orderNo,
+    public Map<String, Object> mgrSearch(@RequestParam Long orderNo,
                                        @RequestParam(defaultValue = "1") int pageNum,
                                        @RequestParam(defaultValue = "10") int pageSize) {
-        // TODO: 判断是否为管理员
-        return orderService.searchOrders(orderNo, pageNum, pageSize);
+        Map<String, Object> result= new HashMap<>();
+        List<Order>orders = orderService.searchOrders(orderNo, pageNum, pageSize);
+        if(orders!=null)
+        {
+            Map<String, Object> resultVo = new HashMap<>();
+            resultVo.put("pageNum", 1);
+            resultVo.put("pageSize", 10);
+            resultVo.put("totalRecord", 1);
+            resultVo.put("totalPage", 1);
+            resultVo.put("startIndex", 0);
+            resultVo.put("prePage", 1);
+            resultVo.put("nextPage", 1);
+            resultVo.put("data", orders);
+
+            result.put("status", 0);
+            result.put("data", orders);
+            return result;
+        }
+        result.put("status", 1);
+        result.put("data", "resultVo");
+        return result;
     }
 
-    /** 管理端：订单详情 */
+    /** 管理端：所有订单查询（分页） */
+    @PostMapping("/mgr/order/findorders.do")
+    public Map<String, Object> mgrListPaging(@RequestParam(defaultValue = "1")  int pageNum,
+                                           @RequestParam(defaultValue = "10") int pageSize) {
+        PageResult<Order> pageResult = orderService.findOrdersPaging(pageNum, pageSize);
+
+        Map<String, Object> result= new HashMap<>();
+        Map<String, Object> resultVo= new HashMap<>();
+        resultVo.put("pageNum", pageResult.getPageNum());
+        resultVo.put("pageSize", pageResult.getPageSize());
+        resultVo.put("totalRecord", pageResult.getTotalRecord());
+        resultVo.put("totalPage", pageResult.getTotalPage());
+        resultVo.put("startIndex", pageResult.getStartIndex());
+        resultVo.put("prePage", pageResult.getPageNum()-1);
+        resultVo.put("nextPage", pageResult.getPageNum()+1);
+        resultVo.put("data", pageResult.getData());
+
+        result.put("status", 0);
+        result.put("data", resultVo);
+        return result;
+    }
+
+    /** 管理端：订单详情（不分页） */
     @GetMapping("/mgr/order/getdetail.do")
-    public Order mgrDetail(@RequestParam Long orderNo) {
-        // TODO: 判断是否为管理员
-        return orderService.getDetail(orderNo);
+    public Map<String, Object> mgrDetail(@RequestParam Long orderNo) {
+        Order order= orderService.getDetail(orderNo);
+        Map<String, Object> result= new HashMap<>();
+        result.put("status", 0);
+        result.put("data", order);
+        return result;
     }
 
     /* =======================================================
@@ -67,7 +112,6 @@ public class OrderController {
     @PostMapping("/order/createorder.do")
     public Order userCreate(@RequestParam Integer addrId) {
         Integer uid = (Integer) session.getAttribute("uid");
-        // TODO: 未登录处理
         return orderService.createOrder(uid, addrId);
     }
 
@@ -89,10 +133,14 @@ public class OrderController {
 
     /** 用户端：确认收货 */
     @PostMapping("/order/confirmreceipt.do")
-    public String userConfirm(@RequestParam Long orderNo) {
+    public Map<String, Object> userConfirm(@RequestParam Long orderNo) {
         Integer uid = (Integer) session.getAttribute("uid");
-        orderService.confirmReceipt(uid, orderNo);
-        return "订单已确认收货！";
+        orderService.confirmReceipt(orderNo);
+        Map<String, Object> result= new HashMap<>();
+
+        result.put("status", 0);
+        result.put("msg","订单已确认收货！");
+        return result;
     }
 
     /** 用户端：取消订单 */

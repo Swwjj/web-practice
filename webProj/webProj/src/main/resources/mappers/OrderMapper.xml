@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.example.webproj.mapper.OrderMapper">
+<mapper namespace="com.example.webproj.mappers.OrderMapper">
 
     <!-- =================== 结果映射 =================== -->
     <resultMap id="OrderResultMap" type="com.example.webproj.pojo.Order">
-        <id     column="id"        property="id"/>
+        <id column="id" property="id"/>
         <result column="order_no"  property="orderNo"/>
         <result column="uid"       property="uid"/>
         <result column="addr_id"   property="addrId"/>
@@ -12,17 +12,15 @@
         <result column="type"      property="type"/>
         <result column="freight"   property="freight"/>
         <result column="status"    property="status"/>
-        <result column="payment_time" property="paymentTime"/>
+        <result column="payment_time"  property="paymentTime"/>
         <result column="delivery_time" property="deliveryTime"/>
         <result column="finish_time"   property="finishTime"/>
         <result column="close_time"    property="closeTime"/>
         <result column="created"       property="created"/>
-        <result column="updated"       property="updated"/>
 
         <!-- 关联收货地址 -->
-        <association property="address"
-                     javaType="com.example.webproj.pojo.Address">
-            <id     column="a_id"  property="id"/>
+        <association property="address" javaType="com.example.webproj.pojo.Address">
+            <id column="a_id"            property="id"/>
             <result column="a_name"      property="name"/>
             <result column="a_phone"     property="phone"/>
             <result column="a_mobile"    property="mobile"/>
@@ -34,88 +32,173 @@
         </association>
 
         <!-- 订单明细列表 -->
-        <collection property="orderItems"
-                    ofType="com.example.webproj.pojo.OrderItem">
-            <id     column="oi_id"   property="id"/>
-            <result column="oi_goods_id"   property="goodsId"/>
-            <result column="oi_goods_name" property="goodsName"/>
-            <result column="oi_icon_url"   property="iconUrl"/>
-            <result column="oi_price"      property="price"/>
-            <result column="oi_quantity"   property="quantity"/>
+        <collection property="orderItems" ofType="com.example.webproj.pojo.OrderItem">
+            <id column="oi_id"              property="id"/>
+            <result column="oi_goods_id"    property="goodsId"/>
+            <result column="oi_goods_name"  property="goodsName"/>
+            <result column="oi_icon_url"    property="iconUrl"/>
+            <result column="oi_price"       property="price"/>
+            <result column="oi_quantity"    property="quantity"/>
             <result column="oi_total_price" property="totalPrice"/>
+            <result column="oi_created"     property="created"/>
         </collection>
     </resultMap>
 
     <!-- ============ 管理端 ============ -->
-    <select id="findOrdersNoPages" resultMap="OrderResultMap">
-        SELECT  o.*,
-        a.id            AS a_id,
-        a.`name`        AS a_name,
-        a.phone         AS a_phone,
-        a.mobile        AS a_mobile,
-        a.province      AS a_province,
-        a.city          AS a_city,
-        a.district      AS a_district,
-        a.addr          AS a_addr,
-        a.zip           AS a_zip,
-        oi.id           AS oi_id,
-        oi.goods_id     AS oi_goods_id,
-        oi.goods_name   AS oi_goods_name,
-        oi.icon_url     AS oi_icon_url,
-        oi.price        AS oi_price,
-        oi.quantity     AS oi_quantity,
-        oi.total_price  AS oi_total_price
-        FROM    orders o
-        LEFT JOIN address     a  ON o.addr_id = a.id
-        LEFT JOIN order_item  oi ON oi.order_id = o.id
-        <where>
-            <if test="orderNo != null">
-                o.order_no = #{orderNo}
-            </if>
-        </where>
-        ORDER BY o.created DESC
-    </select>
+<select id="findOrdersNoPages" resultMap="OrderResultMap">
+    SELECT
+        -- 订单表字段
+        o.id AS id,
+        o.order_no AS order_no,
+        o.uid AS uid,
+        o.addr_id AS addr_id,
+        o.amount AS amount,
+        o.type AS type,
+        o.freight AS freight,
+        o.status AS status,
+        o.payment_time AS payment_time,
+        o.delivery_time AS delivery_time,
+        o.finish_time AS finish_time,
+        o.close_time AS close_time,
+        o.created AS created,
+
+        -- 收货地址字段
+        a.id AS a_id,
+        a.name AS a_name,
+        a.phone AS a_phone,
+        a.mobile AS a_mobile,
+        a.province AS a_province,
+        a.city AS a_city,
+        a.district AS a_district,
+        a.addr AS a_addr,
+        a.zip AS a_zip,
+
+        -- 订单明细字段
+        oi.id AS oi_id,
+        oi.goods_id AS oi_goods_id,
+        oi.goods_name AS oi_goods_name,
+        oi.icon_url AS oi_icon_url,
+        oi.price AS oi_price,
+        oi.quantity AS oi_quantity,
+        oi.total_price AS oi_total_price,
+        oi.created AS oi_created
+    FROM
+        `order` o
+            LEFT JOIN
+        address a ON o.addr_id = a.id
+            LEFT JOIN
+        order_item oi ON o.id = oi.order_id
+    <where>
+        <if test="orderNo != null">
+            o.order_no = #{orderNo}
+        </if>
+    </where>
+</select>
 
     <select id="findOrdersPaging" resultMap="OrderResultMap">
-        SELECT /* 与上方字段相同 */ …
-            LIMIT #{offset}, #{size}
+        SELECT
+            -- 订单表字段
+            o.id AS id,
+            o.order_no AS order_no,
+            o.uid AS uid,
+            o.addr_id AS addr_id,
+            o.amount AS amount,
+            o.type AS type,
+            o.freight AS freight,
+            o.status AS status,
+            o.payment_time AS payment_time,
+            o.delivery_time AS delivery_time,
+            o.finish_time AS finish_time,
+            o.close_time AS close_time,
+            o.created AS created,
+
+            -- 收货地址字段
+            a.id AS a_id,
+            a.name AS a_name,
+            a.phone AS a_phone,
+            a.mobile AS a_mobile,
+            a.province AS a_province,
+            a.city AS a_city,
+            a.district AS a_district,
+            a.addr AS a_addr,
+            a.zip AS a_zip,
+
+            -- 订单明细字段
+            oi.id AS oi_id,
+            oi.goods_id AS oi_goods_id,
+            oi.goods_name AS oi_goods_name,
+            oi.icon_url AS oi_icon_url,
+            oi.price AS oi_price,
+            oi.quantity AS oi_quantity,
+            oi.total_price AS oi_total_price,
+            oi.created AS oi_created
+        FROM
+            `order` o
+                LEFT JOIN
+            address a ON o.addr_id = a.id
+                LEFT JOIN
+            order_item oi ON o.id = oi.order_id
+        ORDER BY o.id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <select id="searchOrders" resultMap="OrderResultMap">
-        SELECT /* 与上方字段相同 */ …
-        WHERE o.order_no = #{orderNo}
-            LIMIT #{offset}, #{size}
+    <select id="getOrderCount" resultType="int">
+        SELECT COUNT(*)
+        FROM `order` o
     </select>
 
     <select id="getDetailByOrderNo" resultMap="OrderResultMap">
-        SELECT /* 与上方字段相同 */ …
-        WHERE o.order_no = #{orderNo}
+        SELECT
+        -- 订单表字段
+        o.id AS id,
+        o.order_no AS order_no,
+        o.uid AS uid,
+        o.addr_id AS addr_id,
+        o.amount AS amount,
+        o.type AS type,
+        o.freight AS freight,
+        o.status AS status,
+        o.payment_time AS payment_time,
+        o.delivery_time AS delivery_time,
+        o.finish_time AS finish_time,
+        o.close_time AS close_time,
+        o.created AS created,
+
+        -- 收货地址字段
+        a.id AS a_id,
+        a.name AS a_name,
+        a.phone AS a_phone,
+        a.mobile AS a_mobile,
+        a.province AS a_province,
+        a.city AS a_city,
+        a.district AS a_district,
+        a.addr AS a_addr,
+        a.zip AS a_zip,
+
+        -- 订单明细字段
+        oi.id AS oi_id,
+        oi.goods_id AS oi_goods_id,
+        oi.goods_name AS oi_goods_name,
+        oi.icon_url AS oi_icon_url,
+        oi.price AS oi_price,
+        oi.quantity AS oi_quantity,
+        oi.total_price AS oi_total_price,
+        oi.created AS oi_created
+        FROM
+        `order` o
+        LEFT JOIN
+        address a ON o.addr_id = a.id
+        LEFT JOIN
+        order_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_no = #{orderNo}
     </select>
 
     <!-- ============ 用户端 ============ -->
-    <select id="findUserOrders" resultMap="OrderResultMap">
-        SELECT /* 与上方字段相同 */ …
-        WHERE o.uid = #{uid}
-        <if test="status != null">
-            AND o.status = #{status}
-        </if>
-        ORDER BY o.created DESC
-        LIMIT #{offset}, #{size}
-    </select>
 
     <!-- ============ 状态更新 ============ -->
-    <update id="updateOrderStatus">
-        UPDATE orders
-        SET status = #{status},
-            updated = #{updateTime}
-        WHERE order_no = #{orderNo}
-    </update>
+
 
     <!-- 创建订单（主表插入，子表请在 Service 中循环批量插） -->
-    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO orders(order_no, uid, addr_id, amount, type, freight, status,
-                           created, updated)
-        VALUES (#{orderNo}, #{uid}, #{addrId}, #{amount}, #{type}, #{freight},
-                #{status}, #{created}, #{updated})
-    </insert>
+
 </mapper>
