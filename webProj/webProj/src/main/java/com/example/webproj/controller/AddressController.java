@@ -28,8 +28,9 @@ public class AddressController {
     public Map<String, Object> findAddressById(@RequestBody Map<String, String> params,
                                                HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        Integer uid = getCurrentUserId(request);  // Long → Integer
+        //Integer uid = getCurrentUserId(request);  // Long → Integer
 
+        Integer uid=1;
         if (uid == null) {
             result.put("status", 1);
             result.put("msg", "请登录后在进行操作！");
@@ -65,8 +66,8 @@ public class AddressController {
     public Map<String, Object> setDefaultAddress(@RequestParam("id") String idStr,
                                                  HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        Integer uid = getCurrentUserId(request);
-
+//        Integer uid = getCurrentUserId(request);
+          Integer uid = 1;
         if (uid == null) {
             result.put("status", 1);
             result.put("msg", "请登录后在进行操作！");
@@ -89,8 +90,8 @@ public class AddressController {
     @GetMapping("/findaddrs.do")
     public Map<String, Object> findAddresses(HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        Integer uid = getCurrentUserId(request);
-
+//        Integer uid = getCurrentUserId(request);
+        Integer uid = 1;
         if (uid == null) {
             result.put("status", 1);
             result.put("msg", "请登录后在进行操作！");
@@ -108,8 +109,8 @@ public class AddressController {
     public Map<String, Object> deleteAddress(@RequestParam("id") String idStr,
                                              HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        Integer uid = getCurrentUserId(request);
-
+//        Integer uid = getCurrentUserId(request);
+        Integer uid = 2;
         if (uid == null) {
             result.put("status", 1);
             result.put("msg", "请登录后在进行操作！");
@@ -133,8 +134,8 @@ public class AddressController {
     public Map<String, Object> saveAddress(@RequestBody Address address,
                                            HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
-        Integer uid = getCurrentUserId(request);
-
+//        Integer uid = getCurrentUserId(request);
+        Integer uid = 1;
         if (uid == null) {
             result.put("status", 1);
             result.put("msg", "请登录后在进行操作！");

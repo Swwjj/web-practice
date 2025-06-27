@@ -22,7 +22,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<Address> findAddressesByUid(Integer uid) {
-        return List.of();
+        return addressMapper.findByUserId(uid);
     }
 
 //    @Override

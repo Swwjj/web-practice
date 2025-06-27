@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.webproj.mapper.AddressMapper">
+<mapper namespace="com.example.webproj.mappers.AddressMapper">
 
     <select id="findById" resultType="com.example.webproj.pojo.Address">
         SELECT id, user_id AS userId, name, phone, mobile, province, city, district,
@@ -12,10 +12,10 @@
 
     <select id="findByUserId" resultType="com.example.webproj.pojo.Address">
         SELECT id, user_id AS userId, name, phone, mobile, province, city, district,
-               addr, zip, `dfault` AS dfault, isDel, created, updated
+               addr, zip, dfault, isDel, created, updated
         FROM address
         WHERE user_id = #{userId} AND isDel = 0
-        ORDER BY `dfault` DESC, updated DESC
+        ORDER BY dfault DESC, updated DESC
     </select>
 
     <update id="updateAddress">
@@ -34,14 +34,14 @@
 
     <update id="setDefaultAddress">
         UPDATE address
-        SET `dfault` = 1,
+        SET dfault = 1,
             updated = NOW()
         WHERE id = #{id} AND user_id = #{userId} AND isDel = 0
     </update>
 
     <update id="resetDefaultAddress">
         UPDATE address
-        SET `dfault` = 0
+        SET dfault = 0
         WHERE user_id = #{userId} AND isDel = 0
     </update>
 
@@ -55,7 +55,7 @@
     <insert id="insertAddress" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO address (
             user_id, name, phone, mobile, province, city, district,
-            addr, zip, `dfault`, isDel, created, updated
+            addr, zip, dfault, isDel, created, updated
         ) VALUES (
                      #{userId}, #{name}, #{phone}, #{mobile}, #{province}, #{city}, #{district},
                      #{addr}, #{zip}, #{dfault}, #{isDel}, #{created}, #{updated}
