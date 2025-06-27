@@ -3,7 +3,7 @@ package com.example.webproj.service;
 import java.util.Map;
 
 public interface ShoppingCartService {
-    Map<String, Object> getCartCount(Integer shoppingCartId);
+    int getCartCount(Integer shoppingCartId);
     Map<String, Object> updateCartItem(Integer userId, Integer productId, Integer count, Integer checked);
     Map<String, Object> clearCart(Integer userId);
     Map<String, Object> deleteCartItem(Integer userId, Integer productId);

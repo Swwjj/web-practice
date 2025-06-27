@@ -22,26 +22,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     /**
      * 获取用户购物车商品数量
-     * @param userId 用户ID（如果未登录，传入null）
-     * @return 包含状态和数据的Map
+     * @param userId 用户ID
+     * @return 购物车商品数量
      */
-    public Map<String, Object> getCartCount(Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (userId == null) {
-            // 用户未登录
-            result.put("status", 1);
-            result.put("msg", "请登录后，再查看购物车！");
-            return result;
-        }
-
+    public int getCartCount(Integer userId) {
         // 查询购物车商品数量（如果购物车为空，返回0）
-        int count = shoppingCartMapper.getCartCountByUserId(userId);
-
-        // 返回成功结果
-        result.put("status", 0);
-        result.put("data", count);
-        return result;
+        return shoppingCartMapper.getCartCountByUserId(userId);
     }
 
     /**
@@ -61,33 +47,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     ) {
         Map<String, Object> result = new HashMap<>();
 
-        // 检查用户是否登录
-        if (userId == null) {
-            result.put("status", 1);
-            result.put("msg", "请登录后，再查看购物车！");
-            return result;
-        }
-
-        // 检查参数有效性
-        if (productId == null || quantity == null || checked == null) {
-            result.put("status", 1);
-            result.put("msg", "参数不完整！");
-            return result;
-        }
-
         // 更新购物车商品
         int affectedRows = shoppingCartMapper.updateCartItem(userId, productId, quantity, checked);
 
         if (affectedRows == 0) {
             result.put("status", 1);
-            result.put("msg", "更新失败，商品可能不存在于购物车中！");
+            result.put("msg", "更新失败，商品不存在！");
             return result;
         }
 
         // 获取更新后的购物车列表
         List<ShoppingCartVo> cartItems = shoppingCartMapper.getCartItems(userId);
 
-        // 计算总价(示例中返回0，实际应根据业务需求计算)
+        // 计算总价
         BigDecimal totalPrice = BigDecimal.ZERO;
         for (ShoppingCartVo item : cartItems) {
             totalPrice = totalPrice.add(item.getTotalPrice());
@@ -111,13 +83,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Transactional
     public Map<String, Object> clearCart(Integer userId) {
         Map<String, Object> result = new HashMap<>();
-
-        // 检查用户是否登录
-        if (userId == null) {
-            result.put("status", 1);
-            result.put("msg", "请登录后，再查看购物车！");
-            return result;
-        }
 
         // 执行清空购物车操作
         int affectedRows = shoppingCartMapper.clearCart(userId);

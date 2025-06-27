@@ -24,8 +24,21 @@ public class ShoppingCartController {
         // 从Session中获取用户ID（假设登录后存储在"userId"属性中）
         Integer userId = (Integer) session.getAttribute("userId");
 
+        Map<String, Object> result = new HashMap<>();
+
+        if (userId == null) {
+            // 用户未登录
+            result.put("status", 1);
+            result.put("msg", "请登录后，再查看购物车！");
+            return result;
+        }
         // 调用Service获取购物车数量
-        return shoppingCartService.getCartCount(userId);
+        int count = shoppingCartService.getCartCount(userId);
+        // 返回成功结果
+        result.put("status", 0);
+        result.put("data", count);
+
+        return result;
     }
 
     @GetMapping("/updatecarts.do")
@@ -36,32 +49,56 @@ public class ShoppingCartController {
             @RequestParam("checked") String checkedStr
     ) {
         // 从Session中获取用户ID
-        Integer userId = (Integer) session.getAttribute("userId");
+        //Integer userId = (Integer) session.getAttribute("userId");
+        Integer userId = 1;
+
+        Map<String, Object> result = new HashMap<>();
+        // 检查用户是否登录
+        if (userId == null) {
+            result.put("status", 1);
+            result.put("msg", "请登录后，再查看购物车！");
+            return result;
+        }
 
         // 参数转换
-        Integer productId = null;
-        Integer count = null;
-        Integer checked = null;
+        Integer productId;
+        Integer quantity;
+        Integer checked;
 
         try {
             productId = Integer.parseInt(productIdStr);
-            count = Integer.parseInt(countStr);
+            quantity = Integer.parseInt(countStr);
             checked = Integer.parseInt(checkedStr);
+
         } catch (NumberFormatException e) {
-            Map<String, Object> result = new HashMap<>();
             result.put("status", 1);
             result.put("msg", "参数格式错误！");
             return result;
         }
 
+        // 检查参数有效性
+        if (productId == null || quantity == null || checked == null) {
+            result.put("status", 1);
+            result.put("msg", "参数不完整！");
+            return result;
+        }
+
         // 调用Service更新购物车
-        return shoppingCartService.updateCartItem(userId, productId, count, checked);
+        return shoppingCartService.updateCartItem(userId, productId, quantity, checked);
     }
 
     @GetMapping("/clearcarts.do")
     public Map<String, Object> clearCart(HttpSession session) {
         // 从Session中获取用户ID
         Integer userId = (Integer) session.getAttribute("userId");
+
+        Map<String, Object> result = new HashMap<>();
+        // 检查用户是否登录
+        if (userId == null) {
+            result.put("status", 1);
+            result.put("msg", "请登录后，再查看购物车！");
+            return result;
+        }
 
         // 调用Service清空购物车
         return shoppingCartService.clearCart(userId);
@@ -75,13 +112,20 @@ public class ShoppingCartController {
         // 从Session中获取用户ID
         Integer userId = (Integer) session.getAttribute("userId");
 
+        Map<String, Object> result = new HashMap<>();
+        // 检查用户是否登录
+        if (userId == null) {
+            result.put("status", 1);
+            result.put("msg", "请登录后，再查看购物车！");
+            return result;
+        }
+
         // 参数转换
-        Integer productId = null;
+        int productId;
 
         try {
             productId = Integer.parseInt(productIdStr);
         } catch (NumberFormatException e) {
-            Map<String, Object> result = new HashMap<>();
             result.put("status", 1);
             result.put("msg", "商品ID格式错误！");
             return result;

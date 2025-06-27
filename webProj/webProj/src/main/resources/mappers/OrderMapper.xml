@@ -1,6 +1,121 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.example.mapper.OrderMapper">
+<mapper namespace="com.example.webproj.mapper.OrderMapper">
 
+    <!-- =================== 结果映射 =================== -->
+    <resultMap id="OrderResultMap" type="com.example.webproj.pojo.Order">
+        <id     column="id"        property="id"/>
+        <result column="order_no"  property="orderNo"/>
+        <result column="uid"       property="uid"/>
+        <result column="addr_id"   property="addrId"/>
+        <result column="amount"    property="amount"/>
+        <result column="type"      property="type"/>
+        <result column="freight"   property="freight"/>
+        <result column="status"    property="status"/>
+        <result column="payment_time" property="paymentTime"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="finish_time"   property="finishTime"/>
+        <result column="close_time"    property="closeTime"/>
+        <result column="created"       property="created"/>
+        <result column="updated"       property="updated"/>
 
+        <!-- 关联收货地址 -->
+        <association property="address"
+                     javaType="com.example.webproj.pojo.Address">
+            <id     column="a_id"  property="id"/>
+            <result column="a_name"      property="name"/>
+            <result column="a_phone"     property="phone"/>
+            <result column="a_mobile"    property="mobile"/>
+            <result column="a_province"  property="province"/>
+            <result column="a_city"      property="city"/>
+            <result column="a_district"  property="district"/>
+            <result column="a_addr"      property="addr"/>
+            <result column="a_zip"       property="zip"/>
+        </association>
+
+        <!-- 订单明细列表 -->
+        <collection property="orderItems"
+                    ofType="com.example.webproj.pojo.OrderItem">
+            <id     column="oi_id"   property="id"/>
+            <result column="oi_goods_id"   property="goodsId"/>
+            <result column="oi_goods_name" property="goodsName"/>
+            <result column="oi_icon_url"   property="iconUrl"/>
+            <result column="oi_price"      property="price"/>
+            <result column="oi_quantity"   property="quantity"/>
+            <result column="oi_total_price" property="totalPrice"/>
+        </collection>
+    </resultMap>
+
+    <!-- ============ 管理端 ============ -->
+    <select id="findOrdersNoPages" resultMap="OrderResultMap">
+        SELECT  o.*,
+        a.id            AS a_id,
+        a.`name`        AS a_name,
+        a.phone         AS a_phone,
+        a.mobile        AS a_mobile,
+        a.province      AS a_province,
+        a.city          AS a_city,
+        a.district      AS a_district,
+        a.addr          AS a_addr,
+        a.zip           AS a_zip,
+        oi.id           AS oi_id,
+        oi.goods_id     AS oi_goods_id,
+        oi.goods_name   AS oi_goods_name,
+        oi.icon_url     AS oi_icon_url,
+        oi.price        AS oi_price,
+        oi.quantity     AS oi_quantity,
+        oi.total_price  AS oi_total_price
+        FROM    orders o
+        LEFT JOIN address     a  ON o.addr_id = a.id
+        LEFT JOIN order_item  oi ON oi.order_id = o.id
+        <where>
+            <if test="orderNo != null">
+                o.order_no = #{orderNo}
+            </if>
+        </where>
+        ORDER BY o.created DESC
+    </select>
+
+    <select id="findOrdersPaging" resultMap="OrderResultMap">
+        SELECT /* 与上方字段相同 */ …
+            LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="searchOrders" resultMap="OrderResultMap">
+        SELECT /* 与上方字段相同 */ …
+        WHERE o.order_no = #{orderNo}
+            LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="getDetailByOrderNo" resultMap="OrderResultMap">
+        SELECT /* 与上方字段相同 */ …
+        WHERE o.order_no = #{orderNo}
+    </select>
+
+    <!-- ============ 用户端 ============ -->
+    <select id="findUserOrders" resultMap="OrderResultMap">
+        SELECT /* 与上方字段相同 */ …
+        WHERE o.uid = #{uid}
+        <if test="status != null">
+            AND o.status = #{status}
+        </if>
+        ORDER BY o.created DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- ============ 状态更新 ============ -->
+    <update id="updateOrderStatus">
+        UPDATE orders
+        SET status = #{status},
+            updated = #{updateTime}
+        WHERE order_no = #{orderNo}
+    </update>
+
+    <!-- 创建订单（主表插入，子表请在 Service 中循环批量插） -->
+    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders(order_no, uid, addr_id, amount, type, freight, status,
+                           created, updated)
+        VALUES (#{orderNo}, #{uid}, #{addrId}, #{amount}, #{type}, #{freight},
+                #{status}, #{created}, #{updated})
+    </insert>
 </mapper>
