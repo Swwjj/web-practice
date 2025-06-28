@@ -195,10 +195,118 @@
     </select>
 
     <!-- ============ 用户端 ============ -->
+    <update id="updateOrderStatus">
+        UPDATE `order`
+        SET status = #{status},
+            updated = NOW()
+        WHERE
+            order_no = #{orderNo}
+        AND uid = #{uid}
+    </update>
 
-    <!-- ============ 状态更新 ============ -->
+    <select id="getDetailByOrderNo" resultMap="OrderResultMap">
+        SELECT
+            -- 订单表字段
+            o.id AS id,
+            o.order_no AS order_no,
+            o.uid AS uid,
+            o.addr_id AS addr_id,
+            o.amount AS amount,
+            o.type AS type,
+            o.freight AS freight,
+            o.status AS status,
+            o.payment_time AS payment_time,
+            o.delivery_time AS delivery_time,
+            o.finish_time AS finish_time,
+            o.close_time AS close_time,
+            o.created AS created,
 
+            -- 收货地址字段
+            a.id AS a_id,
+            a.name AS a_name,
+            a.phone AS a_phone,
+            a.mobile AS a_mobile,
+            a.province AS a_province,
+            a.city AS a_city,
+            a.district AS a_district,
+            a.addr AS a_addr,
+            a.zip AS a_zip,
 
-    <!-- 创建订单（主表插入，子表请在 Service 中循环批量插） -->
+            -- 订单明细字段
+            oi.id AS oi_id,
+            oi.goods_id AS oi_goods_id,
+            oi.goods_name AS oi_goods_name,
+            oi.icon_url AS oi_icon_url,
+            oi.price AS oi_price,
+            oi.quantity AS oi_quantity,
+            oi.total_price AS oi_total_price,
+            oi.created AS oi_created
+        FROM
+            `order` o
+                LEFT JOIN
+            address a ON o.addr_id = a.id
+                LEFT JOIN
+            order_item oi ON o.id = oi.order_id
+        WHERE
+            o.order_no = #{orderNo}
+    </select>
+
+    <select id="getOrderCountByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM `order` o
+        WHERE uid=#{uid}
+    </select>
+
+    <select id="findUserOrders" resultMap="OrderResultMap">
+        SELECT
+            -- 订单表字段
+            o.id AS id,
+            o.order_no AS order_no,
+            o.uid AS uid,
+            o.addr_id AS addr_id,
+            o.amount AS amount,
+            o.type AS type,
+            o.freight AS freight,
+            o.status AS status,
+            o.payment_time AS payment_time,
+            o.delivery_time AS delivery_time,
+            o.finish_time AS finish_time,
+            o.close_time AS close_time,
+            o.created AS created,
+
+            -- 收货地址字段
+            a.id AS a_id,
+            a.name AS a_name,
+            a.phone AS a_phone,
+            a.mobile AS a_mobile,
+            a.province AS a_province,
+            a.city AS a_city,
+            a.district AS a_district,
+            a.addr AS a_addr,
+            a.zip AS a_zip,
+
+            -- 订单明细字段
+            oi.id AS oi_id,
+            oi.goods_id AS oi_goods_id,
+            oi.goods_name AS oi_goods_name,
+            oi.icon_url AS oi_icon_url,
+            oi.price AS oi_price,
+            oi.quantity AS oi_quantity,
+            oi.total_price AS oi_total_price,
+            oi.created AS oi_created
+        FROM
+            `order` o
+                LEFT JOIN
+            address a ON o.addr_id = a.id
+                LEFT JOIN
+            order_item oi ON o.id = oi.order_id
+
+        WHERE o.uid=#{uid}
+        AND o.status=#{status}
+
+        ORDER BY o.id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
 
 </mapper>

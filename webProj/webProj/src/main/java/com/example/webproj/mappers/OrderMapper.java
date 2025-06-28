@@ -28,9 +28,11 @@ public interface OrderMapper {
                                @Param("size")    int     size);
 
     /* ============ 状态更新 ============ */
-    int updateOrderStatus(@Param("orderNo")    Long          orderNo,
-                          @Param("status")     Integer       status,
-                          @Param("updateTime") LocalDateTime updateTime);
+    int updateOrderStatus(@Param("userId") Integer uid,
+                          @Param("orderNo")    Long          orderNo,
+                          @Param("status")    int          status);
 
     int insertOrder(Order order);        // 创建订单
+
+    int getOrderCountByUserId(@Param("uid")     Integer uid);
 }

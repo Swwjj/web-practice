@@ -24,7 +24,7 @@ public interface OrderService {
 
     Order createOrder(Integer uid, Integer addrId);
 
-    void confirmReceipt(Long orderNo);
+    void confirmReceipt(Integer uid, Long orderNo);
 
     void cancelOrder(Integer uid, Long orderNo);
 }

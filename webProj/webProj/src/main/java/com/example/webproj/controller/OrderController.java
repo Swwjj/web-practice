@@ -117,27 +117,75 @@ public class OrderController {
 
     /** 用户端：订单分页列表 */
     @GetMapping("/order/getlist.do")
-    public PageResult<Order> userList(@RequestParam(defaultValue = "1")  int pageNo,
+    public Map<String, Object> userList(@RequestParam(defaultValue = "1")  int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize,
                                       @RequestParam(required = false)    Integer status) {
         Integer uid = (Integer) session.getAttribute("uid");
-        return orderService.getUserOrders(uid, status, pageNo, pageSize);
+        Map<String, Object> result= new HashMap<>();
+
+        if(uid == null)
+        {
+            result.put("status", 1);
+            result.put("msg","请登录后在进行操作！");
+            return result;
+        }
+
+        PageResult<Order> pageResult = orderService.getUserOrders(uid, status, pageNo, pageSize);
+
+        Map<String, Object> resultVo= new HashMap<>();
+        resultVo.put("pageNum", pageResult.getPageNum());
+        resultVo.put("pageSize", pageResult.getPageSize());
+        resultVo.put("totalRecord", pageResult.getTotalRecord());
+        resultVo.put("totalPage", pageResult.getTotalPage());
+        resultVo.put("startIndex", pageResult.getStartIndex());
+        resultVo.put("prePage", pageResult.getPageNum()-1);
+        resultVo.put("nextPage", pageResult.getPageNum()+1);
+        resultVo.put("data", pageResult.getData());
+
+        result.put("status", 0);
+        result.put("data", resultVo);
+        return result;
     }
 
     /** 用户端：订单详情 */
     @GetMapping("/order/getdetail.do")
-    public Order userDetail(@RequestParam Long orderNo) {
-        // 如需校验订单归属可在 Service 内处理
-        return orderService.getDetail(orderNo);
+    public Map<String, Object> userDetail(@RequestParam Long orderNo) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        Map<String, Object> result= new HashMap<>();
+
+        if(userId == null)
+        {
+            result.put("status", 1);
+            result.put("msg","请登录后在进行操作！");
+            return result;
+        }
+
+        if(orderNo == null)
+        {
+            result.put("status", 1);
+            result.put("msg","参数错误！");
+            return result;
+        }
+
+        Order order = orderService.getDetail(orderNo);
+        result.put("status", 0);
+        result.put("data",order);
+        return result;
     }
 
     /** 用户端：确认收货 */
     @PostMapping("/order/confirmreceipt.do")
     public Map<String, Object> userConfirm(@RequestParam Long orderNo) {
-        Integer uid = (Integer) session.getAttribute("uid");
-        orderService.confirmReceipt(orderNo);
+        Integer userId = (Integer) session.getAttribute("userId");
         Map<String, Object> result= new HashMap<>();
-
+        if(userId == null)
+        {
+            result.put("status", 1);
+            result.put("msg"," 失败！");
+            return result;
+        }
+        orderService.confirmReceipt(userId,orderNo);
         result.put("status", 0);
         result.put("msg","订单已确认收货！");
         return result;
@@ -145,9 +193,18 @@ public class OrderController {
 
     /** 用户端：取消订单 */
     @PostMapping("/order/cancelorder.do")
-    public String userCancel(@RequestParam Long orderNo) {
-        Integer uid = (Integer) session.getAttribute("uid");
-        orderService.cancelOrder(uid, orderNo);
-        return "该订单已经取消！";
+    public Map<String, Object> userCancel(@RequestParam Long orderNo) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Map<String, Object> result= new HashMap<>();
+        if(userId == null)
+        {
+            result.put("status", 1);
+            result.put("msg"," 失败！");
+            return result;
+        }
+        orderService.cancelOrder(userId, orderNo);
+        result.put("status", 0);
+        result.put("msg","订单已确认收货！");
+        return result;
     }
 }

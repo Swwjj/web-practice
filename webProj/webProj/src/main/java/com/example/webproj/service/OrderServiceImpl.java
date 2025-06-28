@@ -54,8 +54,9 @@ public class OrderServiceImpl implements OrderService {
     public PageResult<Order> getUserOrders(Integer uid, Integer status,
                                            int pageNum, int pageSize) {
         int offset = (pageNum - 1) * pageSize;
+        int orderNum = orderMapper.getOrderCountByUserId(uid);
         List<Order> list = orderMapper.findUserOrders(uid, status, offset, pageSize);
-        return new PageResult<>(pageNum, pageSize, list.size(), list);
+        return new PageResult<>(pageNum, pageSize, orderNum, list);
     }
 
     @Override
@@ -81,14 +82,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void confirmReceipt(Long orderNo) {
+    public void confirmReceipt(Integer uid, Long orderNo) {
         // 仅允许本人且订单已发货
-        orderMapper.updateOrderStatus(orderNo, 5, LocalDateTime.now());
+        orderMapper.updateOrderStatus(uid, orderNo, 5);
     }
 
     @Override
     public void cancelOrder(Integer uid, Long orderNo) {
         // 校验状态，更新为取消
-        orderMapper.updateOrderStatus(orderNo, 6, LocalDateTime.now());
+        orderMapper.updateOrderStatus(uid, orderNo, 6);
     }
 }
