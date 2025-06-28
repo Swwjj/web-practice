@@ -1,4 +1,4 @@
 package com.example.webproj.service;
 
-public class ShoppingCartServiceImpl {
+public class ShoppingCartServiceImpl implements ShoppingCartService{
 }
