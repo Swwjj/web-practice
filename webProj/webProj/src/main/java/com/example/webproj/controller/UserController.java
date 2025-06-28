@@ -167,14 +167,14 @@ public class UserController {
     }
 
     @PostMapping("/resetpassword.do")
-    public Map<String, Object> resetPassword(@RequestParam int id, @RequestParam String asw, @RequestParam String newpwd) {
+    public Map<String, Object> resetPassword(@RequestParam String account, @RequestParam String asw, @RequestParam String newpwd) {
 
-        boolean isValid = userService.checkSecurityAnswer(id, asw);
+        boolean isValid = userService.checkSecurityAnswer(account, asw);
         if (!isValid) {
             return error("密保答案错误！");
         }
 
-        int rowsAffected = userService.updateUserPassword(id, newpwd);
+        int rowsAffected = userService.updateUserPassword(account, newpwd);
         if (rowsAffected > 0) {
             return success("密码修改成功！");
         } else {
@@ -272,7 +272,7 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 //    }
 
-    @PostMapping("/getuserinfo.do")
+    @GetMapping("/getuserinfo.do")
     public ResponseEntity<?> getUserinfo(HttpSession session) {
        User user = (User) session.getAttribute("user");
         if (user == null) {

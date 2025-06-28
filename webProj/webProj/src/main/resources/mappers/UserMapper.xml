@@ -85,6 +85,6 @@
     <update id="updatePasswordById" parameterType="map">
         UPDATE user
         SET password = #{newpwd}
-        WHERE id = #{id}
+        WHERE account = #{account}
     </update>
 </mapper>

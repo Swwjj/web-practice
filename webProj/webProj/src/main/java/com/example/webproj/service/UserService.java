@@ -23,6 +23,6 @@ public interface UserService {
     boolean updatePassword(String account, String oldpassword, String newpassword);
 
 
-    boolean checkSecurityAnswer(int id, String asw);
-    int updateUserPassword(int id, String newpwd);
+    boolean checkSecurityAnswer(String account, String asw);
+    int updateUserPassword(String account, String newpwd);
 }

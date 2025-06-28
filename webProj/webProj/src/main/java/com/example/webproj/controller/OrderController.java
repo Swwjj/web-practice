@@ -204,7 +204,7 @@ public class OrderController {
         }
         orderService.cancelOrder(userId, orderNo);
         result.put("status", 0);
-        result.put("msg","订单已确认收货！");
+        result.put("msg","订单已取消！");
         return result;
     }
 }

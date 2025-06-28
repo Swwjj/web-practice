@@ -169,8 +169,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkSecurityAnswer(int id, String asw) {
-        User user = userMapper.selectById(id);
+    public boolean checkSecurityAnswer(String account, String asw) {
+        User user = userMapper.findByAccount(account);
         if (user == null) {
             return false;
         }
@@ -178,8 +178,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int updateUserPassword(int id, String newpwd) {
-        return userMapper.updatePasswordById(id, newpwd);
+    public int updateUserPassword(String account, String newpwd) {
+        return userMapper.updatePasswordById(account, newpwd);
     }
 
     public User getUserByAccount(String account) {

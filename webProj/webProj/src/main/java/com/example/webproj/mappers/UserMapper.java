@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserMapper {
         User findByAccount(String account);
         User selectById(int id);
-        int updatePasswordById(int id, String newpwd);
+        int updatePasswordById(String account, String newpwd);
         User findByAccountnoasw(String account);
         User getUserinfo(String account);
         User findByEmail(String email);

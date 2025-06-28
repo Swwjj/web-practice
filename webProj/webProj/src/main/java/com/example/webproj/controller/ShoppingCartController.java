@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/actionmall/cart")
-@CrossOrigin(origins = "*")
 public class ShoppingCartController {
 
     private final ShoppingCartService shoppingCartService;

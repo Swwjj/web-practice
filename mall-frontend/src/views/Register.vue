@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { register, checkInfo } from '@/api/user';
+import { register } from '@/api/user';
 
 const router = useRouter();
 
@@ -19,19 +19,13 @@ const formErrors = ref({});
 const successMessage = ref('');
 
 // 校验函数
-const validateField = async (field, type) => {
+const validateField = async (field) => {
   if (!registerForm.value[field]) {
     formErrors.value[field] = '此字段不能为空';
     return false;
   }
-  try {
-    await checkInfo({ info: registerForm.value[field], type: type });
-    formErrors.value[field] = ''; // 清除错误
-    return true;
-  } catch (error) {
-    formErrors.value[field] = error.message;
-    return false;
-  }
+  formErrors.value[field] = ''; // 清除错误
+  return true;
 };
 
 const handleRegister = async () => {
@@ -46,9 +40,9 @@ const handleRegister = async () => {
   }
 
   // 挨个校验
-  const isAccountValid = await validateField('account', 'account');
-  const isEmailValid = await validateField('email', 'email');
-  const isPhoneValid = await validateField('phone', 'phone');
+  const isAccountValid = await validateField('account');
+  const isEmailValid = await validateField('email');
+  const isPhoneValid = await validateField('phone');
 
   if (!isAccountValid || !isEmailValid || !isPhoneValid) {
     return;
@@ -56,7 +50,7 @@ const handleRegister = async () => {
   
   // 提交注册
   try {
-    const { password, confirmPassword, ...registerData } = registerForm.value;
+    const { confirmPassword, ...registerData } = registerForm.value;
     await register(registerData);
     successMessage.value = '注册成功！正在跳转到登录页面...';
     setTimeout(() => {
@@ -75,7 +69,7 @@ const handleRegister = async () => {
       <form @submit.prevent="handleRegister">
         <div class="input-group">
           <label for="account">用户名</label>
-          <input type="text" v-model="registerForm.account" @blur="validateField('account', 'account')" placeholder="请输入用户名" required>
+          <input type="text" v-model="registerForm.account" @blur="validateField('account')" placeholder="请输入用户名" required>
           <span v-if="formErrors.account" class="error-text">{{ formErrors.account }}</span>
         </div>
         <div class="input-group">
@@ -89,12 +83,12 @@ const handleRegister = async () => {
         </div>
         <div class="input-group">
           <label for="email">电子邮箱</label>
-          <input type="email" v-model="registerForm.email" @blur="validateField('email', 'email')" placeholder="请输入电子邮箱" required>
+          <input type="email" v-model="registerForm.email" @blur="validateField('email')" placeholder="请输入电子邮箱" required>
            <span v-if="formErrors.email" class="error-text">{{ formErrors.email }}</span>
         </div>
         <div class="input-group">
           <label for="phone">手机号码</label>
-          <input type="tel" v-model="registerForm.phone" @blur="validateField('phone', 'phone')" placeholder="请输入手机号码" required>
+          <input type="tel" v-model="registerForm.phone" @blur="validateField('phone')" placeholder="请输入手机号码" required>
            <span v-if="formErrors.phone" class="error-text">{{ formErrors.phone }}</span>
         </div>
         <div class="input-group">
