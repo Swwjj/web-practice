@@ -83,6 +83,11 @@
         <div class="detail-content" v-html="product.detail"></div>
       </div>
     </div>
+
+    <!-- 提示信息 -->
+    <div v-if="msg" :class="{'success-msg': success, 'error-msg': !success}" class="msg">
+      <p>{{ msg }}</p>
+    </div>
   </div>
 </template>
 
@@ -90,15 +95,22 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getProductDetail } from '@/api/product';
+import { addCartItem } from '@/api/cart';
+import { useUserStore } from '@/stores/user';
+import { useCartStore } from '@/stores/cart';
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
+const cartStore = useCartStore();
 
 const product = ref(null);
 const loading = ref(true);
 const error = ref('');
 const quantity = ref(1);
 const currentImage = ref('');
+const msg = ref('');
+const success = ref(false);
 
 // 计算子图片数组
 const subImages = computed(() => {
@@ -147,9 +159,52 @@ const increaseQuantity = () => {
 };
 
 // 加入购物车
-const addToCart = () => {
-  // TODO: 实现加入购物车功能
-  alert(`已将 ${quantity.value} 件 ${product.value.name} 加入购物车`);
+const addToCart = async () => {
+  if (!userStore.isLoggedIn) {
+    msg.value = '请先登录后再加入购物车！';
+    success.value = false;
+    setTimeout(() => router.push('/login'), 1500);
+    return;
+  }
+
+  if (!product.value) {
+    msg.value = '商品信息加载失败！';
+    success.value = false;
+    return;
+  }
+
+  try {
+    msg.value = '';
+    success.value = false;
+    
+    const res = await addCartItem({
+      productId: product.value.id,
+      count: quantity.value,
+      name: product.value.name,
+      price: product.value.price,
+      iconUrl: product.value.iconUrl
+    });
+
+    if (res.status === 0) {
+      msg.value = res.msg || '商品已成功加入购物车！';
+      success.value = true;
+      
+      // 刷新购物车数量
+      await cartStore.fetchCartCount();
+      
+      // 3秒后清除提示
+      setTimeout(() => {
+        msg.value = '';
+        success.value = false;
+      }, 3000);
+    } else {
+      msg.value = res.msg || '加入购物车失败！';
+      success.value = false;
+    }
+  } catch (e) {
+    msg.value = e.message || '加入购物车失败！';
+    success.value = false;
+  }
 };
 
 // 立即购买
@@ -477,5 +532,25 @@ onMounted(() => {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.msg {
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.success-msg {
+  background: #f0f9ff;
+  color: #67c23a;
+  border: 1px solid #c2e7b0;
+}
+
+.error-msg {
+  background: #fef0f0;
+  color: #f56c6c;
+  border: 1px solid #fbc4c4;
 }
 </style> 

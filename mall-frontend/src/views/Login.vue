@@ -1,6 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-box">
+      <button class="back-btn" @click="goBack">← 返回</button>
       <h2>用户登录</h2>
       <form @submit.prevent="handleLogin">
         <div class="input-group">
@@ -57,6 +58,14 @@ const handleLogin = async () => {
     errorMessage.value = error.message || '登录失败，请稍后再试';
   }
 };
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    router.push('/');
+  }
+};
 </script>
 
 <style scoped>
@@ -75,6 +84,22 @@ const handleLogin = async () => {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  position: relative;
+}
+
+.back-btn {
+  position: absolute;
+  left: 24px;
+  top: 24px;
+  background: none;
+  border: none;
+  color: #409EFF;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+}
+.back-btn:hover {
+  text-decoration: underline;
 }
 
 h2 {
