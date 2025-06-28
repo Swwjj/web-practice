@@ -42,6 +42,26 @@ const routes = [
     name: 'ProductTypes',
     component: () => import('@/views/ProductTypes.vue'),
   },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: () => import('@/views/Cart.vue'),
+  },
+  {
+    path: '/checkout',
+    name: 'Checkout',
+    component: () => import('@/views/Checkout.vue'),
+  },
+  {
+    path: '/orders',
+    name: 'OrderList',
+    component: () => import('@/views/OrderList.vue'),
+  },
+  {
+    path: '/orders/:orderNo',
+    name: 'OrderDetail',
+    component: () => import('@/views/OrderDetail.vue'),
+  },
   // 后续添加其他模块页面，如用户管理、订单管理等
 ]
 

@@ -6,7 +6,13 @@
         <router-link to="/products" class="main-btn">查看全部商品</router-link>
         <router-link to="/product-types" class="main-btn">产品分类</router-link>
         <router-link to="/profile" class="main-btn">个人中心</router-link>
-        <button @click="handleLogout" class="main-btn logout-red">退出登录</button>
+        <router-link to="/orders" class="main-btn">订单</router-link>
+        <div class="cart-icon" @click="handleCartClick">
+          🛒
+          <span v-if="cartStore.cartCount > 0" class="cart-count">{{ cartStore.cartCount }}</span>
+        </div>
+        <button v-if="userStore.isLoggedIn" @click="handleLogout" class="main-btn logout-red">退出登录</button>
+        <button v-else @click="() => router.push('/login')" class="main-btn">登录</button>
       </div>
     </div>
     
@@ -114,10 +120,12 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
+import { useCartStore } from '@/stores/cart';
 import { getFloorProducts, getHotProducts } from '@/api/product';
 
 const router = useRouter();
 const userStore = useUserStore();
+const cartStore = useCartStore();
 
 const loading = ref(true);
 const error = ref('');
@@ -131,7 +139,7 @@ const hotProducts = ref([]);
 
 const handleLogout = async () => {
   await userStore.logout();
-  router.push('/login');
+  router.push('/');
 };
 
 const goToProductDetail = (productId) => {
@@ -171,7 +179,18 @@ const fetchHotProducts = async () => {
 onMounted(() => {
   fetchFloorProducts();
   fetchHotProducts();
+  if (userStore.isLoggedIn) {
+    cartStore.fetchCartCount();
+  }
 });
+
+function handleCartClick() {
+  if (!userStore.isLoggedIn) {
+    router.push('/login');
+  } else {
+    router.push('/cart');
+  }
+}
 </script>
 
 <style scoped>
@@ -379,5 +398,22 @@ onMounted(() => {
 .hot-product-card .product-stock {
   font-size: 0.8rem;
   color: #7f8c8d;
+}
+
+.cart-icon {
+  position: relative;
+  display: inline-block;
+  margin-left: 16px;
+  cursor: pointer;
+}
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #f56c6c;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
 }
 </style>

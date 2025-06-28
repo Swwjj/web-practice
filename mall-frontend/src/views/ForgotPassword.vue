@@ -114,13 +114,7 @@ const handleCheckAnswer = async () => {
 const handleResetPwd = async () => {
   msg.value = '';
   success.value = false;
-  console.log('重置密码参数', {
-    id: userId.value,
-    asw: asw.value,
-    newpwd: newpwd.value
-  });
   try {
-    // 这里 userId 实际应为后端返回的 id，这里用 account 代替
     const res = await resetPassword({
       id: userId.value,
       asw: asw.value,
