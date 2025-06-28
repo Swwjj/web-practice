@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/actionmall/mgr/param")
+@RequestMapping("/actionmall")
 public class ProductTypeController {
 
     @Autowired
@@ -21,7 +21,7 @@ public class ProductTypeController {
      * 递归获取产品类型数据接口(前端接口)
      * 该接口用于前台获取产品参数的数据。
      */
-    @GetMapping("/findallparams.do")
+    @GetMapping("/param/findallparams.do")
     public Map<String, Object> findAllParams() {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -45,7 +45,7 @@ public class ProductTypeController {
      * @param formId 产品类型ID
      * @return 结果
      */
-    @PostMapping(value = "/delparam.do", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/mgr/param/delparam.do", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public Map<String, Object> deleteParam(
             @RequestBody(required = false) Map<String, String> jsonBody,
             @RequestParam(value = "id", required = false) String formId) {
@@ -97,7 +97,7 @@ public class ProductTypeController {
      * 获取带路径的参数信息接口
      * @return 结果
      */
-    @GetMapping("/findpathparam.do")
+    @GetMapping("/mgr/param/findpathparam.do")
     public Map<String, Object> findPathParam() {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -116,7 +116,7 @@ public class ProductTypeController {
      * @param productTypeId 产品类型ID
      * @return 结果
      */
-    @GetMapping("/findpartstype.do")
+    @GetMapping("/mgr/param/findpartstype.do")
     public Map<String, Object> findPartsType(@RequestParam String productTypeId) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -134,7 +134,7 @@ public class ProductTypeController {
      * 获取产品类型参数接口
      * @return 结果
      */
-    @GetMapping("/findptype.do")
+    @GetMapping("/mgr/param/findptype.do")
     public Map<String, Object> findPType() {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -153,7 +153,7 @@ public class ProductTypeController {
      * @param id 产品参数ID
      * @return 结果
      */
-    @PostMapping("/findchildren.do")
+    @PostMapping("/mgr/param/findchildren.do")
     public Map<String, Object> findChildren(@RequestParam String id) {
         Map<String, Object> result = new HashMap<>();
         try {
@@ -172,7 +172,7 @@ public class ProductTypeController {
      * @param params 产品参数ID
      * @return 结果
      */
-    @PostMapping("/updateparam.do")
+    @PostMapping("/mgr/param/updateparam.do")
     public Map<String, Object> updateParam(@RequestBody Map<String, String> params) {
         String id = params.get("id");
         String name = params.get("name");
@@ -205,7 +205,7 @@ public class ProductTypeController {
      *  sortOrder 序号
      * @return 结果
      */
-    @PostMapping("/saveparam.do")
+    @PostMapping("/mgr/param/saveparam.do")
     public Map<String, Object> saveParam(@RequestBody Map<String, String> params) {
         String name = params.get("name");
         String parentId = params.get("parentId");
