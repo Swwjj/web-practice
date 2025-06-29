@@ -273,27 +273,27 @@ public class UserController {
 //    }
 
     @GetMapping("/getuserinfo.do")
-    public ResponseEntity<?> getUserinfo(HttpSession session) {
+    public Map<String, Object> getUserinfo(HttpSession session) {
        User user = (User) session.getAttribute("user");
+       Map<String,Object> result = new HashMap<>();
         if (user == null) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", 1);
-            errorResponse.put("msg", "用户未登录或会话已过期！");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            result.put("status", 1);
+            result.put("msg", "用户未登录或会话已过期！");
+            return result;
         }
 
         String account = user.getAccount();
         User user1 = userService.getUserinfo(account);
 
         if (user1 != null) {
-            return ResponseEntity.ok(user1); // 成功返回用户对象
+            result.put("status", 0);
+            result.put("data",user1);
+            return result;
         }
 
-        // 用户不存在或其他错误
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("status", 1);
-        errorResponse.put("msg", "无法获取用户信息！");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        result.put("status", 1);
+        result.put("msg", "无法获取用户信息！");
+        return result;
     }
 
     @GetMapping("/check_valid.do")

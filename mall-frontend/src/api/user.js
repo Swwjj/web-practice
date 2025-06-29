@@ -237,7 +237,10 @@ export function updatePassword(data) {
   return request({
     url: '/user/updatepassword.do',
     method: 'post',
-    data
+    params: {
+      oldpwd: data.oldpwd,
+      newpwd: data.newpwd
+    }
   });
 }
 
@@ -289,6 +292,6 @@ export function getUserByAccount(data) {
   return request({
     url: '/user/getUserByAccount.do',
     method: 'post',
-    data
+    params: { account: data.account }
   });
 }

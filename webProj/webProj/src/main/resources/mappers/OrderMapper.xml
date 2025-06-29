@@ -262,5 +262,73 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
+    <!-- ============ 创建订单 ============ -->
+    
+    <!-- 插入订单主表 -->
+    <insert id="insertOrder" parameterType="com.example.webproj.pojo.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `order` (
+            order_no,
+            uid,
+            addr_id,
+            amount,
+            type,
+            freight,
+            status,
+            created,
+            updated
+        ) VALUES (
+            #{orderNo},
+            #{uid},
+            #{addrId},
+            #{amount},
+            #{type},
+            #{freight},
+            #{status},
+            #{created},
+            #{updated}
+        )
+    </insert>
+
+    <!-- 插入订单项 -->
+    <insert id="insertOrderItem" parameterType="com.example.webproj.pojo.OrderItem">
+        INSERT INTO order_item (
+            uid,
+            order_id,
+            goods_id,
+            goods_name,
+            icon_url,
+            price,
+            quantity,
+            total_price,
+            created,
+            updated
+        ) VALUES (
+            #{uid},
+            #{orderId},
+            #{goodsId},
+            #{goodsName},
+            #{iconUrl},
+            #{price},
+            #{quantity},
+            #{totalPrice},
+            #{created},
+            #{updated}
+        )
+    </insert>
+
+    <!-- 清空用户购物车 -->
+    <delete id="clearUserCart">
+        DELETE FROM shopping_cart
+        WHERE user_id = #{userId}
+    </delete>
+
+    <!-- 扣减商品库存 -->
+    <update id="decreaseProductStock">
+        UPDATE product
+        SET stock = stock - #{quantity},
+            updated = NOW()
+        WHERE id = #{productId}
+        AND stock >= #{quantity}
+    </update>
 
 </mapper>

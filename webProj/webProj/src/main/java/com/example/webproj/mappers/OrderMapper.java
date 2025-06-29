@@ -35,4 +35,12 @@ public interface OrderMapper {
     int insertOrder(Order order);        // 创建订单
 
     int getOrderCountByUserId(@Param("uid")     Integer uid);
+
+    /* ============ 创建订单相关 ============ */
+    int insertOrderItem(OrderItem orderItem);  // 插入订单项
+
+    int clearUserCart(@Param("userId") Integer userId);  // 清空用户购物车
+
+    int decreaseProductStock(@Param("productId") Integer productId, 
+                            @Param("quantity") Integer quantity);  // 扣减商品库存
 }

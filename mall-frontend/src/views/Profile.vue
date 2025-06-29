@@ -58,7 +58,13 @@ const handleSave = async () => {
   formMsg.value = '';
   formSuccess.value = false;
   try {
-    await userStore.updateUserInfo(editForm.value);
+    // 创建要发送的数据副本，并转换性别字段
+    const dataToSend = {
+      ...editForm.value,
+      sex: editForm.value.sex === 1 ? '男' : '女'
+    };
+    
+    await userStore.updateUserInfo(dataToSend);
     formMsg.value = '保存成功！';
     formSuccess.value = true;
     isEditing.value = false;
@@ -116,7 +122,10 @@ const closePwdDialog = () => {
             <li><strong>邮箱：</strong>{{ userStore.userInfo.email }}</li>
             <li><strong>手机号：</strong>{{ userStore.userInfo.phone }}</li>
             <li><strong>年龄：</strong>{{ userStore.userInfo.age }}</li>
-            <li><strong>性别：</strong>{{ userStore.userInfo.sex === 1 ? '男' : userStore.userInfo.sex === 0 ? '女' : '未知' }}</li>
+            <li><strong>性别：</strong>{{ 
+              userStore.userInfo.sex === 1 || userStore.userInfo.sex === true ? '男' : 
+              userStore.userInfo.sex === 0 || userStore.userInfo.sex === false ? '女' : '未知' 
+            }}</li>
             <li><strong>密保问题：</strong>{{ userStore.userInfo.question }}</li>
             <li><strong>密保答案：</strong>{{ userStore.userInfo.asw }}</li>
             <li><strong>注册时间：</strong>{{ new Date(userStore.userInfo.create_time).toLocaleString() }}</li>

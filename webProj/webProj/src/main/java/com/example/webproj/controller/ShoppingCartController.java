@@ -1,5 +1,6 @@
 package com.example.webproj.controller;
 
+import com.example.webproj.pojo.User;
 import com.example.webproj.service.ShoppingCartService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ public class ShoppingCartController {
     @GetMapping("/getcartcount.do")
     public Map<String, Object> getCartCount(HttpSession session) {
         // 从Session中获取用户ID（假设登录后存储在"userId"属性中）
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
 
         Map<String, Object> result = new HashMap<>();
 
@@ -48,8 +50,8 @@ public class ShoppingCartController {
             @RequestParam("checked") String checkedStr
     ) {
         // 从Session中获取用户ID
-        //Integer userId = (Integer) session.getAttribute("userId");
-        Integer userId = 1;
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
 
         Map<String, Object> result = new HashMap<>();
         // 检查用户是否登录
@@ -89,7 +91,8 @@ public class ShoppingCartController {
     @GetMapping("/clearcarts.do")
     public Map<String, Object> clearCart(HttpSession session) {
         // 从Session中获取用户ID
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
 
         Map<String, Object> result = new HashMap<>();
         // 检查用户是否登录
@@ -109,7 +112,8 @@ public class ShoppingCartController {
             @RequestParam("productId") String productIdStr
     ) {
         // 从Session中获取用户ID
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
 
         Map<String, Object> result = new HashMap<>();
         // 检查用户是否登录
@@ -137,8 +141,10 @@ public class ShoppingCartController {
     @GetMapping("/findallcarts.do")
     public Map<String, Object> findAllCarts(HttpSession session) {
         // 从Session中获取用户ID
-        Integer userId = (Integer) session.getAttribute("userId");
+        //User user = (User) session.getAttribute("user");
+        //Integer userId = user.getId();
 
+        Integer userId = 1;
         // 调用Service获取购物车商品列表
         return shoppingCartService.getCartItems(userId);
     }
@@ -150,7 +156,8 @@ public class ShoppingCartController {
             @RequestParam("count") String countStr
     ) {
         // 从Session中获取用户ID
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
 
         // 参数转换
         Integer productId = null;

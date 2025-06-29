@@ -11,8 +11,10 @@ public class Order {
     private Integer addrId;     // 收货地址ID
     private BigDecimal amount;  // 订单总金额
     private Integer type;       // 支付类型
+    private String typeDesc;    // 支付类型描述
     private Integer freight;    // 运费
     private Integer status;     // 订单状态
+    private String statusDesc;  // 订单状态描述
     private LocalDateTime paymentTime; // 支付时间
     private LocalDateTime deliveryTime; // 发货时间
     private LocalDateTime finishTime; // 完成时间
@@ -206,5 +208,25 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public String getTypeDesc() {
+        return typeDesc;
+    }
+
+    public void setTypeDesc(String typeDesc) {
+        this.typeDesc = typeDesc;
+    }
+
+    public String getStatusDesc() {
+        return statusDesc;
+    }
+
+    public void setStatusDesc(String statusDesc) {
+        this.statusDesc = statusDesc;
+    }
+
+    public Object getUid() {
+        return  uid;
     }
 }

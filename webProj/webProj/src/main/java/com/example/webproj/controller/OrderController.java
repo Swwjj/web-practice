@@ -2,6 +2,7 @@ package com.example.webproj.controller;
 
 import com.example.webproj.pojo.Order;
 import com.example.webproj.pojo.PageResult;
+import com.example.webproj.pojo.User;
 import com.example.webproj.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ public class OrderController {
         if(orders!=null)
         {
             Map<String, Object> resultVo = new HashMap<>();
-            resultVo.put("pageNum", 1);
-            resultVo.put("pageSize", 10);
+            resultVo.put("pageNum", pageNum);
+            resultVo.put("pageSize", pageSize);
             resultVo.put("totalRecord", 1);
             resultVo.put("totalPage", 1);
             resultVo.put("startIndex", 0);
@@ -110,9 +111,40 @@ public class OrderController {
 
     /** 用户端：创建订单 */
     @PostMapping("/order/createorder.do")
-    public Order userCreate(@RequestParam Integer addrId) {
-        Integer uid = (Integer) session.getAttribute("uid");
-        return orderService.createOrder(uid, addrId);
+    public Map<String, Object> userCreate(@RequestParam Integer addrId ,@RequestParam Integer productId) {
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                result.put("status", 1);
+                result.put("msg", "请先登录！");
+                return result;
+            }
+            
+            Integer userId = user.getId();
+            if (addrId == null) {
+                result.put("status", 1);
+                result.put("msg", "收货地址不能为空！");
+                return result;
+            }
+            
+            Order order = orderService.createOrder(userId, addrId);
+            
+            result.put("status", 0);
+            result.put("msg", "订单创建成功！");
+            result.put("data", order);
+            return result;
+            
+        } catch (RuntimeException e) {
+            result.put("status", 1);
+            result.put("msg", e.getMessage());
+            return result;
+        } catch (Exception e) {
+            result.put("status", 1);
+            result.put("msg", "创建订单失败，请稍后重试！");
+            return result;
+        }
     }
 
     /** 用户端：订单分页列表 */
@@ -120,7 +152,8 @@ public class OrderController {
     public Map<String, Object> userList(@RequestParam(defaultValue = "1")  int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize,
                                       @RequestParam(required = false)    Integer status) {
-        Integer uid = (Integer) session.getAttribute("uid");
+        User user = (User) session.getAttribute("user");
+        Integer uid = user.getId();
         Map<String, Object> result= new HashMap<>();
 
         if(uid == null)
@@ -151,7 +184,8 @@ public class OrderController {
     @GetMapping("/order/getdetail.do")
     public Map<String, Object> userDetail(@RequestParam Long orderNo) {
 
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
         Map<String, Object> result= new HashMap<>();
 
         if(userId == null)
@@ -177,7 +211,8 @@ public class OrderController {
     /** 用户端：确认收货 */
     @PostMapping("/order/confirmreceipt.do")
     public Map<String, Object> userConfirm(@RequestParam Long orderNo) {
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
         Map<String, Object> result= new HashMap<>();
         if(userId == null)
         {
@@ -185,16 +220,23 @@ public class OrderController {
             result.put("msg"," 失败！");
             return result;
         }
-        orderService.confirmReceipt(userId,orderNo);
-        result.put("status", 0);
-        result.put("msg","订单已确认收货！");
-        return result;
+        boolean confirmed = orderService.confirmReceipt(userId,orderNo);
+        if(confirmed) {
+            result.put("status", 0);
+            result.put("msg", "订单已确认收货！");
+            return result;
+        }else{
+            result.put("status", 1);
+            result.put("msg"," 订单还未发货！");
+            return result;
+        }
     }
 
     /** 用户端：取消订单 */
     @PostMapping("/order/cancelorder.do")
     public Map<String, Object> userCancel(@RequestParam Long orderNo) {
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
         Map<String, Object> result= new HashMap<>();
         if(userId == null)
         {

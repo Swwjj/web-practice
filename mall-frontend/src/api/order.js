@@ -1,3 +1,5 @@
+// Mock数据（开发阶段使用，联调时请注释）
+/*
 // mock订单池，支持多种状态
 const mockOrders = {
   '1001': {
@@ -269,41 +271,47 @@ export function confirmReceipt(orderNo) {
   order.statusDesc = '已完成';
   return Promise.resolve({ status: 0, msg: '订单已确认收货！' });
 }
+*/
 
 // 真实请求（联调时启用）
-// import request from './request';
-// export function createOrder({ addrId }) {
-//   return request({
-//     url: '/order/createorder.do',
-//     method: 'post',
-//     data: { addrId }
-//   });
-// }
-// export function getOrderList({ pageNo, pageSize, status }) {
-//   return request({
-//     url: '/order/getlist.do',
-//     method: 'get',
-//     params: { pageNo, pageSize, status }
-//   });
-// }
-// export function getOrderDetail(orderNo) {
-//   return request({
-//     url: '/order/getdetail.do',
-//     method: 'get',
-//     params: { orderNo }
-//   });
-// }
-// export function cancelOrder(orderNo) {
-//   return request({
-//     url: '/order/cancelorder.do',
-//     method: 'post',
-//     data: { orderNo }
-//   });
-// }
-// export function confirmReceipt(orderNo) {
-//   return request({
-//     url: '/order/confirmreceipt.do',
-//     method: 'post',
-//     data: { orderNo }
-//   });
-// } 
+import request from './request';
+
+export function createOrder({ addrId }) {
+  return request({
+    url: '/order/createorder.do',
+    method: 'post',
+    params: { addrId }
+  });
+}
+
+export function getOrderList({ pageNo, pageSize, status }) {
+  return request({
+    url: '/order/getlist.do',
+    method: 'get',
+    params: { pageNo, pageSize, status }
+  });
+}
+
+export function getOrderDetail(orderNo) {
+  return request({
+    url: '/order/getdetail.do',
+    method: 'get',
+    params: { orderNo }
+  });
+}
+
+export function cancelOrder(orderNo) {
+  return request({
+    url: '/order/cancelorder.do',
+    method: 'post',
+    params: { orderNo }
+  });
+}
+
+export function confirmReceipt(orderNo) {
+  return request({
+    url: '/order/confirmreceipt.do',
+    method: 'post',
+    params: { orderNo }
+  });
+} 
