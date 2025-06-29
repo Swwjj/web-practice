@@ -1,22 +1,27 @@
 package com.example.webproj.pojo;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductType {
     private Integer id;
     private Integer parentId;
     private String name;
     private Integer sortOrder;
-    private Boolean status;  // 对应tinyint(1)
+    private Boolean status; // 对应 TINYINT(1)
     private Integer level;
     private LocalDateTime created;
     private LocalDateTime updated;
+    private List<ProductType> children; // 添加 children 字段支持树形结构
 
     // 无参构造函数
     public ProductType() {
+        this.children = new ArrayList<>(); // 初始化 children
     }
 
-    // 全参构造函数
+    // 全参构造函数（不包含 children）
     public ProductType(Integer id, Integer parentId, String name, Integer sortOrder,
                        Boolean status, Integer level, LocalDateTime created, LocalDateTime updated) {
         this.id = id;
@@ -27,9 +32,10 @@ public class ProductType {
         this.level = level;
         this.created = created;
         this.updated = updated;
+        this.children = new ArrayList<>(); // 初始化 children
     }
 
-    // Getter和Setter方法
+    // Getter 和 Setter 方法
     public Integer getId() {
         return id;
     }
@@ -78,20 +84,29 @@ public class ProductType {
         this.level = level;
     }
 
-    public LocalDateTime getCreated() {
-        return created;
+    // 修改为返回毫秒时间戳
+    public Long getCreated() {
+        return created != null ? created.toInstant(ZoneOffset.ofHours(8)).toEpochMilli() : null;
     }
 
     public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
-    public LocalDateTime getUpdated() {
-        return updated;
+    public Long getUpdated() {
+        return updated != null ? updated.toInstant(ZoneOffset.ofHours(8)).toEpochMilli() : null;
     }
 
     public void setUpdated(LocalDateTime updated) {
         this.updated = updated;
+    }
+
+    public List<ProductType> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ProductType> children) {
+        this.children = children;
     }
 
     // 自动设置时间的方法
@@ -125,6 +140,7 @@ public class ProductType {
                 ", level=" + level +
                 ", created=" + created +
                 ", updated=" + updated +
+                ", children=" + children +
                 '}';
     }
 }

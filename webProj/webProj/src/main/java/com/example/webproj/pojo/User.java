@@ -168,7 +168,7 @@ public class User {
 
     // 业务方法 - 判断是否为管理员
     public boolean isAdmin() {
-        return role != null && role == 1; // 假设1表示管理员
+        return role != null && role == 2;
     }
 
     // 业务方法 - 判断用户是否有效

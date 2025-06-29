@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.webproj.mappers.UserMapper">
+
+    <select id="getUserinfo" resultType="com.example.webproj.pojo.User">
+        SELECT id,account,email,age,sex,del,phone,question,asw,role,name,create_time as createTime,update_time as updateTime
+        FROM user
+        WHERE account = #{account} AND del = false
+    </select>
+
+<!--    <select id="findByAccount" resultType="com.example.webproj.pojo.User">-->
+<!--        SELECT * FROM user WHERE account = #{account} AND del = false-->
+<!--    </select>-->
+
+    <select id="findByAccount" resultType="com.example.webproj.pojo.User">
+        SELECT  id,account,password,email,age,sex,del,phone,question,asw,role,name,create_time as createTime,update_time as updateTime
+        FROM user
+        WHERE account = #{account} AND del = false
+    </select>
+
+    <select id="selectById" resultType="com.example.webproj.pojo.User">
+        SELECT  id,account,password,email,age,sex,del,phone,question,asw,role,name,create_time as createTime,update_time as updateTime
+        FROM user
+        WHERE id = #{id} AND del = false
+    </select>
+    <!-- 删除用户 -->
+    <delete id="deleteUserById" parameterType="int">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
+
+    <!-- 检查用户是否存在订单 -->
+    <select id="checkUserHasOrders" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM `order` WHERE uid = #{userId}
+    </select>
+
+    <select id="findByAccountnoasw" resultType="com.example.webproj.pojo.User">
+        SELECT  id,account,email,age,sex,del,phone,question,role,name,create_time as createTime,update_time as updateTime
+        FROM user
+        WHERE account = #{account} AND del = false
+    </select>
+
+    <select id="findByEmail" resultType="com.example.webproj.pojo.User">
+        SELECT * FROM user WHERE email = #{email} AND del = false
+    </select>
+
+    <select id="findByPhone" resultType="com.example.webproj.pojo.User">
+        SELECT * FROM user WHERE phone = #{phone} AND del = false
+    </select>
+
+    <select id="findById" resultType="com.example.webproj.pojo.User">
+        SELECT id,account,name,sex,age,phone,email
+        FROM user
+        WHERE id = #{id} AND del = false
+    </select>
+
+    <select id="findAll" resultType="com.example.webproj.pojo.User">
+        SELECT id,account,name,sex,age,phone,email
+        FROM user
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.webproj.pojo.User">
+        INSERT INTO user(account, password, email, phone, question, asw, role, age, sex, create_time, update_time, del, name)
+        VALUES(#{account}, #{password}, #{email}, #{phone}, #{question}, #{asw}, #{role}, #{age}, #{sex}, #{createTime}, #{updateTime}, #{del}, #{name})
+    </insert>
+
+    <select id="finduserquestion"  resultType="com.example.webproj.pojo.User">
+        SELECT question FROM user WHERE account = #{account} AND del = false
+    </select>
+
+    <update id="updatePassword">
+        UPDATE user SET password = #{newpwd}, update_time = NOW()
+        WHERE account = #{account} AND del = false
+    </update>
+
+    <update id="updateUser">
+        UPDATE user SET name = #{name},account = #{account},age = #{age},phone = #{phone},email = #{email},sex = #{sex},update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateUserinfo">
+        UPDATE user SET email = #{email},phone = #{phone},question = #{question},asw = #{asw},age = #{age},sex = #{sex},update_time = NOW()
+        WHERE id = #{id} AND del = false
+    </update>
+
+    <update id="updatePasswordById" parameterType="map">
+        UPDATE user
+        SET password = #{newpwd}
+        WHERE account = #{account}
+    </update>
+</mapper>

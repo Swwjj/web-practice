@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.webproj.mappers.ShoppingCartMapper">
+    <select id="getCartCountByUserId" resultType="int">
+        SELECT COUNT(product_id)
+        FROM shopping_cart
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 更新购物车商品数量 -->
+    <update id="updateCartItem">
+        UPDATE shopping_cart
+        SET
+            quantity = #{quantity},
+            checked = #{checked},
+            updated = NOW()
+        WHERE
+            user_id = #{userId}
+          AND product_id = #{productId}
+    </update>
+
+    <!-- 获取用户购物车商品列表 -->
+    <select id="getCartItems" resultType="com.example.webproj.pojo.ShoppingCartVo">
+        SELECT
+            sc.id,
+            sc.user_id as userId,
+            sc.product_id as productId,
+            p.name,
+            sc.quantity,
+            p.price,
+            p.status,
+            (sc.quantity * p.price) as totalPrice,
+            p.stock,
+            p.icon_url as iconUrl,
+            sc.checked
+        FROM
+            shopping_cart sc
+                JOIN
+            product p ON sc.product_id = p.id
+        WHERE
+            sc.user_id = #{userId}
+    </select>
+
+    <!-- 清空用户购物车 -->
+    <delete id="clearCart">
+        DELETE FROM shopping_cart
+        WHERE user_id = #{userId}
+    </delete>
+
+    <!-- 从购物车中删除指定商品 -->
+    <delete id="deleteCartItem">
+        DELETE FROM shopping_cart
+        WHERE user_id = #{userId}
+          AND product_id = #{productId}
+    </delete>
+
+    <!-- 添加商品到购物车或更新已有商品数量 -->
+    <insert id="saveOrUpdateCartItem" parameterType="map">
+        INSERT INTO shopping_cart
+            (user_id, product_id, quantity, created, updated, checked)
+        VALUES
+            (#{userId}, #{productId}, #{quantity}, NOW(), NOW(), 0)
+            ON DUPLICATE KEY UPDATE
+                                 quantity = quantity + VALUES(quantity),
+                                 updated = NOW()
+    </insert>
+</mapper>
