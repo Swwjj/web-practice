@@ -62,6 +62,11 @@ const routes = [
     name: 'OrderDetail',
     component: () => import('@/views/OrderDetail.vue'),
   },
+  {
+    path: '/address',
+    name: 'Address',
+    component: () => import('@/views/Address.vue'),
+  },
   // 后续添加其他模块页面，如用户管理、订单管理等
 ]
 
@@ -75,7 +80,7 @@ router.beforeEach((to, from, next) => {
   const isLoggedIn = userStore.isLoggedIn;
 
   // 定义需要登录才能访问的路由
-  const protectedRoutes = ['/cart', '/profile', '/checkout']; // 示例，后续可添加
+  const protectedRoutes = ['/cart', '/profile', '/checkout', '/orders', '/address']; // 添加地址管理页面
 
   if (protectedRoutes.includes(to.path) && !isLoggedIn) {
     // 如果用户未登录且访问的是受保护页面，则跳转到登录页
