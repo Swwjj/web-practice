@@ -18,6 +18,7 @@ public class Product {
     private Integer isHot = 2;        // 默认值2
     private LocalDateTime created;
     private LocalDateTime updated;
+    private Integer categoryId;
 
     // 无参构造函数
     public Product() {

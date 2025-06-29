@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.webproj.mappers.ProductMapper">
+
+
+
+    <select id="getproductbyid"  resultType="com.example.webproj.pojo.Product">
+        SELECT * FROM product
+        WHERE product_id = #{productId}
+    </select>
+
+    <!-- 基础查询（返回Map） -->
+    <select id="findAllProducts" resultType="map">
+        SELECT * FROM product
+        WHERE status = 2
+    </select>
+
+    <select id="findProductById" resultType="map">
+        SELECT * FROM product
+            WHERE product_id = #{id}
+    </select>
+
+    <!-- 关联查询优化字段选择 -->
+    <select id="findAllProductsWithCategory" resultType="map">
+        SELECT
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.icon_url as iconUrl,
+            p.status
+        FROM product p
+        WHERE p.status = 2
+    </select>
+
+    <!-- 修正后 -->
+    <select id="findProductByIdWithCategory" resultType="map">
+        SELECT *
+        FROM product p
+        WHERE p.id = #{id}
+        AND p.status = 2  <!-- 添加上架状态过滤 -->
+    </select>
+
+
+    <!-- 分页查询 -->
+    <select id="searchProductsWithCategory" resultType="com.example.webproj.pojo.Product">
+        SELECT
+        p.id,
+        p.name,
+        p.price,
+        p.status,
+        pt.name,
+        p.icon_url as iconUrl,
+        p.is_hot as isHot
+        FROM
+            product p
+                LEFT JOIN
+            product_type pt ON p.parts_id=pt.id
+        WHERE 1=1
+        <if test="id != null and id != ''">
+            AND p.id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            AND p.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="status != null">
+            AND p.status = #{status}
+        </if>
+        ORDER BY p.id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 查询总数 -->
+    <select id="countProducts" resultType="int">
+        SELECT COUNT(*)
+        FROM product p
+        WHERE 1=1
+        <if test="id != null and id != ''">
+            AND p.id = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            AND p.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="status != null">
+            AND p.status = #{status}
+        </if>
+    </select>
+    
+
+    <update id="updateProductStatus">
+        UPDATE product
+        SET
+            status = #{status},
+            is_hot = #{hot},
+            updated = NOW()
+        WHERE product_id = #{productId}
+    </update>
+
+
+    <insert id="insertProduct" parameterType="com.example.webproj.pojo.Product" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product (
+            name, product_id, parts_id, icon_url, sub_images,
+            detail, spec_param, price, stock, status,
+            hot, created, updated
+        ) VALUES (
+                     #{name}, #{productId}, #{partsId}, #{iconUrl}, #{subImages},
+                     #{detail}, #{specParam}, #{price}, #{stock}, #{status},
+                     #{hot}, NOW(), NOW()
+                 )
+    </insert>
+
+    <update id="updateProduct" parameterType="com.example.webproj.pojo.Product">
+        UPDATE product SET
+                           name = #{name},
+                           product_id = #{productId},
+                           parts_id = #{partsId},
+                           icon_url = #{iconUrl},
+                           sub_images = #{subImages},
+                           detail = #{detail},
+                           spec_param = #{specParam},
+                           price = #{price},
+                           stock = #{stock},
+                           status = #{status},
+                           is_hot = #{hot},
+                           updated = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="countByName" resultType="int">
+        SELECT COUNT(*) FROM product
+        WHERE name = #{name}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 使用Map参数插入商品 -->
+    <insert id="insertProductFromMap" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product (
+            name, product_id, parts_id, icon_url, sub_images,
+            detail, spec_param, price, stock, status,
+            is_hot, created, updated
+        ) VALUES (#{name}, #{productId}, #{partsId},#{iconUrl},#{subImages},#{detail}, #{specParam}, #{price}, #{stock}, #{status},#{hot}, NOW(), NOW())
+    </insert>
+
+    <!-- 使用Map参数更新商品 -->
+    <update id="updateProductFromMap" parameterType="map">
+        UPDATE product SET
+                           name = #{name},
+                           product_id = #{productId},
+                           parts_id = #{partsId},
+                           sub_images = #{subImages},
+                           detail = #{detail},
+                           spec_param = #{specParam},
+                           price = #{price},
+                           stock = #{stock},
+                           updated = NOW()
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="findByProductId" resultType="map">
+        SELECT
+        id, name, product_id as productId, parts_id as partsId,
+        icon_url as iconUrl, sub_images as subImages, detail,
+        spec_param as specParam, price, stock, status, hot,
+        created, updated
+        FROM product
+        WHERE product_id = #{productId}
+        AND status = 2  <!-- 只查询上架商品 -->
+        ORDER BY hot DESC, updated DESC
+        LIMIT 5        <!-- 每层最多5个商品 -->
+    </select>
+
+
+    <select id="findHotProducts" resultType="map">
+        SELECT
+        id, name, product_id as productId, parts_id as partsId,
+        icon_url as iconUrl, sub_images as subImages, detail,
+        spec_param as specParam, price, stock, status, is_hot,
+        created, updated
+        FROM product
+        WHERE is_hot = 1 AND status = 2  <!-- 只查询热销且上架的商品 -->
+        ORDER BY updated DESC
+        LIMIT #{limit}
+    </select>
+
+
+    <select id="searchProductsByType" resultType="map">
+        SELECT
+        p.id,
+        p.name,
+        p.price,
+        p.status,
+        CASE p.status
+        WHEN 1 THEN '待售'
+        WHEN 2 THEN '在售'
+        WHEN 3 THEN '下架'
+        END as statusDesc,
+        pt.name as productCategory,
+        pc.name as partsCategory,
+        p.icon_url,
+        p.is_hot,
+        CASE p.is_hot
+        WHEN 1 THEN '热销'
+        ELSE '一般'
+        END as hotStatus
+        FROM product p
+        LEFT JOIN product_type pt ON p.product_id = pt.id
+        LEFT JOIN (SELECT 0 as id, '' as name) pc ON 1=1<!-- 模拟空表 -->
+        WHERE 1=1
+        <if test="productTypeId != null and productTypeId != '0'">
+            AND p.product_id = #{productTypeId}
+        </if>
+        <if test="partsId != null and partsId != '0'">
+            AND p.parts_id = #{partsId}
+        </if>
+        <if test="name != null and name != ''">
+            AND p.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        ORDER BY p.id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countProductsByType" resultType="int">
+        SELECT COUNT(*)
+        FROM product p
+        WHERE 1=1
+        <if test="productTypeId != null and productTypeId != '0'">
+            AND p.product_id = #{productTypeId}
+        </if>
+        <if test="partsId != null and partsId != '0'">
+            AND p.parts_id = #{partsId}
+        </if>
+        <if test="name != null and name != ''">
+            AND p.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+    </select>
+</mapper>
