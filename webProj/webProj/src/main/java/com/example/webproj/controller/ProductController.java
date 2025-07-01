@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
-@RequestMapping("/actionmall/mgr/product")
+@RequestMapping("/actionmall/product")
 public class ProductController {
 
     private String uploadPath = "./uploads"; // 默认值，可根据需要修改

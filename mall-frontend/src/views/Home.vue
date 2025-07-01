@@ -7,6 +7,7 @@
         <router-link to="/product-types" class="main-btn">产品分类</router-link>
         <router-link to="/profile" class="main-btn">个人中心</router-link>
         <router-link to="/orders" class="main-btn">订单</router-link>
+        <router-link to="/address" class="main-btn">地址管理</router-link>
         <div class="cart-icon" @click="handleCartClick">
           🛒
           <span v-if="cartStore.cartCount > 0" class="cart-count">{{ cartStore.cartCount }}</span>

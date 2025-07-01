@@ -2,6 +2,7 @@ package com.example.webproj.service;
 
 import com.example.webproj.pojo.Order;
 import com.example.webproj.pojo.PageResult;
+import com.example.webproj.pojo.OrderItemDto;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public interface OrderService {
                                     int pageNum,
                                     int pageSize);
 
-    Order createOrder(Integer uid, Integer addrId);
+    Order createOrder(Integer uid, Integer addrId, List<OrderItemDto> items);
 
     Boolean confirmReceipt(Integer uid, Long orderNo);
 

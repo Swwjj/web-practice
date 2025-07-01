@@ -160,4 +160,8 @@ public class OrderItem {
                 ", updated=" + updated +
                 '}';
     }
+
+    public void setOrderNo(Integer orderId) {
+        this.orderId = orderId ;
+    }
 }

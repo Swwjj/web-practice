@@ -134,6 +134,7 @@ const closePwdDialog = () => {
           <div class="profile-actions">
             <button class="edit-btn" @click="startEdit">编辑信息</button>
             <button class="password-btn" @click="showPwdDialog = true">修改密码</button>
+            <router-link to="/address" class="address-btn">地址管理</router-link>
           </div>
         </template>
         <template v-else>
@@ -298,6 +299,24 @@ h2 {
 .password-btn:hover {
   background: #f3d19e;
   color: #222;
+}
+
+.address-btn {
+  padding: 8px 32px;
+  background: #67c23a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.address-btn:hover {
+  background: #85ce61;
+  color: #fff;
 }
 
 .edit-form {

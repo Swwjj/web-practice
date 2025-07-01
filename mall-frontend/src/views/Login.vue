@@ -36,7 +36,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const loginForm = ref({
-  account: 'admin', // 默认值方便测试
+  account: 'zhangsan', // 默认值方便测试
   password: '123'
 });
 

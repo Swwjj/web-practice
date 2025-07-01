@@ -208,7 +208,7 @@ export function getProductDetail(productId) {
 export function getProductList(params = {}) {
   const {
     productTypeId = '0',
-    partsId = '0', 
+    partsId = '0',
     pageNum = '1',
     pageSize = '10',
     name = ''
@@ -284,12 +284,12 @@ export function getProductList(params = {}) {
     if (name && !product.name.toLowerCase().includes(name.toLowerCase())) {
       return false;
     }
-    
+
     // 产品类型筛选
     if (productTypeId !== '0') {
       const productTypeMap = {
         '1': '混凝土机械',
-        '2': '压路机', 
+        '2': '压路机',
         '3': '挖掘机',
         '4': '装载机'
       };
@@ -297,20 +297,20 @@ export function getProductList(params = {}) {
         return false;
       }
     }
-    
+
     // 配件类型筛选
     if (partsId !== '0') {
       const partsTypeMap = {
         '1': '锂基油',
         '2': '润滑油',
-        '3': '液压油', 
+        '3': '液压油',
         '4': '配件'
       };
       if (product.partsCategory !== partsTypeMap[partsId]) {
         return false;
       }
     }
-    
+
     return true;
   });
 
@@ -341,9 +341,9 @@ export function getProductList(params = {}) {
 
 
 
-
+//
 // import request from './request';
-
+//
 // /**
 // * [真实请求] 首页楼层商品数据接口
 // */
@@ -353,8 +353,8 @@ export function getProductList(params = {}) {
 //     method: 'post',
 //     data: {} // 如果接口不需要参数，传空对象
 //   });
-// } 
-
+// }
+//
 // /**
 // * [真实请求] 热销商品接口
 // */
@@ -364,8 +364,8 @@ export function getProductList(params = {}) {
 //     method: 'post',
 //     data: { num }
 //   });
-// } 
-
+// }
+//
 // /**
 // * [真实请求] 商品详情接口
 // */
@@ -375,8 +375,8 @@ export function getProductList(params = {}) {
 //     method: 'post',
 //     data: { productId }
 //   });
-// } 
-
+// }
+//
 // /**
 // * [真实请求] 商品分页列表接口
 // */
@@ -392,4 +392,4 @@ export function getProductList(params = {}) {
 //       name: params.name || ''
 //     }
 //   });
-// } 
+// }

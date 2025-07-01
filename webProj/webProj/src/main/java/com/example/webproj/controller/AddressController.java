@@ -24,8 +24,7 @@ public class AddressController {
     // 示例中返回固定值，实际中应从session或token中获取
     private Integer getCurrentUserId(HttpSession session) {
         User user = (User) session.getAttribute("user");
-        Integer userId = user.getId();
-        return userId != null ? Integer.parseInt(session.getAttribute("userId").toString()) : null;
+        return user.getId();
     }
 
     // 查询单个地址

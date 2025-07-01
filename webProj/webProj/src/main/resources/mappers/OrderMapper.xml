@@ -255,8 +255,12 @@
                 LEFT JOIN
             order_item oi ON o.id = oi.order_id
 
-        WHERE o.uid=#{uid}
-        AND o.status=#{status}
+        <where>
+            o.uid = #{uid}
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+        </where>
 
         ORDER BY o.id DESC
         LIMIT #{pageSize} OFFSET #{offset}

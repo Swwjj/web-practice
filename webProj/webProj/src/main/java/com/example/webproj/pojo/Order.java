@@ -229,4 +229,12 @@ public class Order {
     public Object getUid() {
         return  uid;
     }
+
+    public void setUserId(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getOrderId() {
+        return id;
+    }
 }

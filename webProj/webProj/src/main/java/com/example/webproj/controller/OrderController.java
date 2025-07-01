@@ -13,12 +13,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.webproj.pojo.OrderCreateRequest;
+import com.example.webproj.pojo.OrderItemDto;
+
 @RestController
 @RequestMapping("/actionmall")
 public class OrderController {
 
     private final OrderService orderService;
-    private final HttpSession  session;          // 简化示例，用 session 存 uid / admin
+    private final HttpSession  session;          // 简化示例，用 session 存 当前用户信息
 
     public OrderController(OrderService orderService, HttpSession session) {
         this.orderService = orderService;
@@ -111,9 +114,8 @@ public class OrderController {
 
     /** 用户端：创建订单 */
     @PostMapping("/order/createorder.do")
-    public Map<String, Object> userCreate(@RequestParam Integer addrId ,@RequestParam Integer productId) {
+    public Map<String, Object> userCreate(@RequestBody OrderCreateRequest request) {
         Map<String, Object> result = new HashMap<>();
-        
         try {
             User user = (User) session.getAttribute("user");
             if (user == null) {
@@ -121,21 +123,18 @@ public class OrderController {
                 result.put("msg", "请先登录！");
                 return result;
             }
-            
             Integer userId = user.getId();
-            if (addrId == null) {
+            if (request.getAddrId() == null || request.getItems() == null || request.getItems().isEmpty()) {
                 result.put("status", 1);
-                result.put("msg", "收货地址不能为空！");
+                result.put("msg", "收货地址和商品不能为空！");
                 return result;
             }
-            
-            Order order = orderService.createOrder(userId, addrId);
-            
+            // 你需要在 service 层实现多商品下单逻辑
+            Order order = orderService.createOrder(userId, request.getAddrId(), request.getItems());
             result.put("status", 0);
             result.put("msg", "订单创建成功！");
             result.put("data", order);
             return result;
-            
         } catch (RuntimeException e) {
             result.put("status", 1);
             result.put("msg", e.getMessage());
@@ -156,7 +155,7 @@ public class OrderController {
         Integer uid = user.getId();
         Map<String, Object> result= new HashMap<>();
 
-        if(uid == null)
+        if(user == null)
         {
             result.put("status", 1);
             result.put("msg","请登录后在进行操作！");

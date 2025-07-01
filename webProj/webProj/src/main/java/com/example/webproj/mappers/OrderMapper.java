@@ -25,22 +25,24 @@ public interface OrderMapper {
     List<Order> findUserOrders(@Param("uid")     Integer uid,
                                @Param("status")  Integer status,
                                @Param("offset")  int     offset,
-                               @Param("size")    int     size);
+                               @Param("pageSize")    int     pageSize);
 
     /* ============ 状态更新 ============ */
     int updateOrderStatus(@Param("userId") Integer uid,
                           @Param("orderNo")    Long          orderNo,
                           @Param("status")    int          status);
 
-    int insertOrder(Order order);        // 创建订单
 
     int getOrderCountByUserId(@Param("uid")     Integer uid);
 
     /* ============ 创建订单相关 ============ */
-    int insertOrderItem(OrderItem orderItem);  // 插入订单项
 
-    int clearUserCart(@Param("userId") Integer userId);  // 清空用户购物车
+
 
     int decreaseProductStock(@Param("productId") Integer productId, 
                             @Param("quantity") Integer quantity);  // 扣减商品库存
+
+    void insertOrder(Order order);
+
+    void insertOrderItem(OrderItem item);
 }

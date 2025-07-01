@@ -1,12 +1,9 @@
 package com.example.webproj.service;
 
 import com.example.webproj.mappers.OrderMapper;
+import com.example.webproj.mappers.ProductMapper;
 import com.example.webproj.mappers.ShoppingCartMapper;
-import com.example.webproj.pojo.Address;
-import com.example.webproj.pojo.Order;
-import com.example.webproj.pojo.OrderItem;
-import com.example.webproj.pojo.ShoppingCartVo;
-import com.example.webproj.pojo.PageResult;
+import com.example.webproj.pojo.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +12,19 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
     private final OrderMapper orderMapper;
     private final ShoppingCartMapper shoppingCartMapper;
+    private final ProductMapper productMapper;
 
-    public OrderServiceImpl(OrderMapper orderMapper, ShoppingCartMapper shoppingCartMapper) {
+    public OrderServiceImpl(OrderMapper orderMapper, ShoppingCartMapper shoppingCartMapper, ProductMapper productMapper) {
         this.orderMapper = orderMapper;
         this.shoppingCartMapper = shoppingCartMapper;
+        this.productMapper = productMapper;
     }
 
     /* ========== 管理端 ========== */
@@ -87,79 +87,45 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order createOrder(Integer uid, Integer addrId) {
-        // 1) 获取用户购物车中的商品
-        List<ShoppingCartVo> cartItems = shoppingCartMapper.getCartItems(uid);
-
-        if (cartItems == null || cartItems.isEmpty()) {
-            throw new RuntimeException("购物车为空，无法创建订单");
-        }
-
-        // 2) 校验库存
-        for (ShoppingCartVo item : cartItems) {
-            if (item.getStock() < item.getQuantity()) {
-                throw new RuntimeException("商品 " + item.getName() + " 库存不足");
-            }
-        }
-
-        // 3) 计算订单总金额
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (ShoppingCartVo item : cartItems) {
-            totalAmount = totalAmount.add(item.getTotalPrice());
-        }
-
-        // 4) 生成订单主表
+    public Order createOrder(Integer uid, Integer addrId, List<OrderItemDto> items) {
+        // 1. 创建订单对象
         Order order = new Order();
-        order.setOrderNo(System.currentTimeMillis());  // 使用时间戳作为订单号
-        order.setUid(uid);
+        // 生成唯一订单号（用当前时间戳）
+        order.setOrderNo(System.currentTimeMillis());
+        order.setUserId(uid);
         order.setAddrId(addrId);
-        order.setAmount(totalAmount);
-        order.setType(1);  // 在线支付
-        order.setFreight(0);  // 免运费
-        order.setStatus(1); // 未付款
-        order.initCreateTime();
-
-        // 5) 插入订单主表
-        int orderResult = orderMapper.insertOrder(order);
-        if (orderResult <= 0) {
-            throw new RuntimeException("创建订单失败");
+        double amount = 0;
+        for (OrderItemDto dto : items) {
+           amount += dto.getPrice() * dto.getQuantity();
         }
+        order.setAmount(new java.math.BigDecimal(amount));
+        order.setType(1);
+        order.setFreight(0);
+        order.setStatus(1);
+        order.setCreated(LocalDateTime.now());
+        // TODO: 设置订单其他属性
 
-        // 6) 批量插入订单项
-        for (ShoppingCartVo cartItem : cartItems) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setUid(uid);
-            orderItem.setOrderId(order.getId());
-            orderItem.setGoodsId(cartItem.getProductId());
-            orderItem.setGoodsName(cartItem.getName());
-            orderItem.setIconUrl(cartItem.getIconUrl());
-            orderItem.setPrice(cartItem.getPrice());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setTotalPrice(cartItem.getTotalPrice());
-            orderItem.initCreateTime();
+        // 2. 遍历 items，生成订单项
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (OrderItemDto dto : items) {
+            OrderItem item = new OrderItem();
+            item.setUid(uid);
+            item.setGoodsId(dto.getProductId());
+            item.setQuantity(dto.getQuantity());
 
-            int itemResult = orderMapper.insertOrderItem(orderItem);
-            if (itemResult <= 0) {
-                throw new RuntimeException("创建订单项失败");
-            }
+            Product product = productMapper.getProductDetailbyid(dto.getProductId());
+            // TODO: 设置商品价格、名称等其他属性
+            orderItems.add(item);
         }
-
-        // 7) 扣减商品库存
-        for (ShoppingCartVo cartItem : cartItems) {
-            int stockResult = orderMapper.decreaseProductStock(cartItem.getProductId(), cartItem.getQuantity());
-            if (stockResult <= 0) {
-                throw new RuntimeException("扣减库存失败，商品 " + cartItem.getName() + " 库存不足");
-            }
-        }
-
-        // 8) 清空用户购物车
-        int clearResult = orderMapper.clearUserCart(uid);
-        if (clearResult < 0) {
-            throw new RuntimeException("清空购物车失败");
-        }
-
-        // 9) 返回完整的订单信息
-        return getDetail(order.getOrderNo());
+         //TODO: 保存订单和订单项到数据库
+         orderMapper.insertOrder(order);
+         for (OrderItem item : orderItems) {
+             item.setOrderNo(order.getOrderId());
+             orderMapper.insertOrderItem(item);
+         }
+        shoppingCartMapper.clearCart(order.getOrderId());
+        // 这里只返回订单对象，实际应返回包含订单项的完整订单
+        return order;
     }
 
     @Override
@@ -169,12 +135,12 @@ public class OrderServiceImpl implements OrderService {
         if (order == null || !order.getUid().equals(uid)) {
             return false; // 订单不存在或不属于当前用户
         }
-
+        
         // 检查订单状态是否为已发货
         if (order.getStatus() != 3) {
             return false; // 订单状态不是已发货，不能确认收货
         }
-
+        
         // 更新订单状态为已完成
         orderMapper.updateOrderStatus(uid, orderNo, 4);
         return true;

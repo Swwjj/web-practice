@@ -147,7 +147,7 @@
 //   });
 // }
 
-// // [真实请求] 购物车相关接口（联调时请启用，开发阶段可注释）
+// [真实请求] 购物车相关接口（联调时请启用，开发阶段可注释）
 import request from './request';
 
 export function getCartCount() {
@@ -176,7 +176,7 @@ export function deleteCartItem(productId) {
   return request({
     url: '/cart/delcarts.do',
     method: 'post',
-    params: { productId }
+    data: { productId }
   });
 }
 
@@ -191,6 +191,6 @@ export function addCartItem({ productId, count }) {
   return request({
     url: '/cart/savecart.do',
     method: 'post',
-    params: { productId, count }
+    data: { productId, count }
   });
 }
