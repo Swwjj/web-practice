@@ -1,15 +1,15 @@
 <template>
   <div class="home-container">
     <div class="header">
-      <h1>欢迎来到商城</h1>
+      <h1 class="main-title">欢迎来到商城</h1>
       <div class="user-actions">
         <router-link to="/products" class="main-btn">查看全部商品</router-link>
         <router-link to="/product-types" class="main-btn">产品分类</router-link>
         <router-link to="/profile" class="main-btn">个人中心</router-link>
         <router-link to="/orders" class="main-btn">订单</router-link>
         <router-link to="/address" class="main-btn">地址管理</router-link>
-        <div class="cart-icon" @click="handleCartClick">
-          🛒
+        <div class="cart-icon main-btn" @click="handleCartClick">
+          购物车
           <span v-if="cartStore.cartCount > 0" class="cart-count">{{ cartStore.cartCount }}</span>
         </div>
         <button v-if="userStore.isLoggedIn" @click="handleLogout" class="main-btn logout-red">退出登录</button>
@@ -202,9 +202,22 @@ function handleCartClick() {
 }
 .header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 30px;
+  margin-top: 30px;
+}
+.main-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 .main-btn {
   display: inline-block;
