@@ -215,36 +215,26 @@ public class ProductServiceImpl implements ProductService {
         if (name == null || name.trim().isEmpty()) {
             return false;
         }
-
-
-            int count = productMapper.countByName(name, excludeId);
-            return count > 0;
-
+        int count = productMapper.countByName(name, excludeId);
+        return count > 0;
     }
 
     @Override
     public Map<String, Object> getFloorProducts() {
         Map<String, Object> result = new HashMap<>();
             // 定义楼层对应的productId
-            int[] floorProductIds = {10023, 10024, 10025, 10026}; // 假设有4个楼层
+            int[] floorProductIds = {8, 7, 1}; // 假设有4个楼层
 
             // 获取每个楼层的商品
             List<Map<String, Object>> oneFloor = productMapper.findByProductId(floorProductIds[0]);
             List<Map<String, Object>> twoFloor = productMapper.findByProductId(floorProductIds[1]);
             List<Map<String, Object>> threeFloor = productMapper.findByProductId(floorProductIds[2]);
-            List<Map<String, Object>> fourFloor = productMapper.findByProductId(floorProductIds[3]);
-
-            // 检查每个楼层是否有足够商品
-            if (oneFloor.size() < 8 || twoFloor.size() < 8 || threeFloor.size() < 8) {
-                return createErrorResponse(1, "楼层商品数据尚未准备完整！");
-            }
 
             // 构建返回数据
             Map<String, Object> data = new HashMap<>();
             data.put("oneFloor", oneFloor);
             data.put("twoFloor", twoFloor);
             data.put("threeFloor", threeFloor);
-            data.put("fourFloor", fourFloor);
 
             result.put("status", 0);
             result.put("data", data);
@@ -275,14 +265,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Map<String, Object> searchProductsByType(Integer pageNum, Integer pageSize,
-                                                    String productTypeId, String partsId,
+                                                    Integer productTypeId, Integer partsId,
                                                     String name) {
         // 计算偏移量
         int offset = (pageNum - 1) * pageSize;
 
         // 查询分页数据
-        List<Map<String, Object>> products = productMapper.searchProductsByType(
-                productTypeId, partsId, name, offset, pageSize);
+        List<Product> products = productMapper.searchProductsByType(productTypeId, partsId, name, offset, pageSize);
 
         // 查询总记录数
         int total = productMapper.countProductsByType(productTypeId, partsId, name);

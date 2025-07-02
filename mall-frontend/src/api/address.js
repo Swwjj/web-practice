@@ -174,7 +174,7 @@ export function getAddressById(id) {
 */
 export function updateAddress(data) {
   return request({
-    url: '/addr/saveaddr.do', // 假设使用相同的接口
+    url: '/addr/updateaddr.do', // 假设使用相同的接口
     method: 'post',
     data
   });

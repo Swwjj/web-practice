@@ -191,6 +191,6 @@ export function addCartItem({ productId, count }) {
   return request({
     url: '/cart/savecart.do',
     method: 'post',
-    data: { productId, count }
+    params: { productId, count }
   });
 }

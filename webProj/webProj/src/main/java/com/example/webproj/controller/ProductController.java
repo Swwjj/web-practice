@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
-@RequestMapping("/actionmall/product")
+@RequestMapping("/actionmall")
 public class ProductController {
 
     private String uploadPath = "./uploads"; // 默认值，可根据需要修改
@@ -36,19 +36,19 @@ public class ProductController {
     }
 
     // 商品查询列表接口
-    @PostMapping("/productlist.do")
+    @PostMapping("/mgr/product/productlist.do")
     public Map<String, Object> getProductList(@RequestParam(required = false) String id) {
         return productService.getProductList(id);
     }
 
     // 商品图片上传接口(原有)
-    @PostMapping("/upload-image.do")
+    @PostMapping("mgr/product/upload-image.do")
     public Map<String, Object> uploadProductImage(@RequestParam("file") MultipartFile file) {
         return handleSingleFileUpload(file);
     }
 
     // 富文本编辑器多图片上传接口
-    @PostMapping("/pic_upload.do")
+    @PostMapping("mgr/product/pic_upload.do")
     public Map<String, Object> uploadEditorImages(@RequestParam("files") MultipartFile[] files) {
         Map<String, Object> result = new HashMap<>();
 
@@ -85,7 +85,7 @@ public class ProductController {
     }
 
     // 商品图片上传接口(单文件，符合规范)
-    @PostMapping("/upload.do")
+    @PostMapping("mgr/product/upload.do")
     public Map<String, Object> uploadSingleImage(@RequestParam("file") MultipartFile file) {
         Map<String, Object> response = handleSingleFileUpload(file);
         // 调整返回格式完全符合规范
@@ -149,20 +149,21 @@ public class ProductController {
         return response;
     }
 
-    @PostMapping("/searchproducts.do")
+    //商品查询分页列表
+    @PostMapping("mgr/product/searchproducts.do")
     public Map<String, Object> searchProducts(@RequestBody Map<String, String> params) {
         if (!validateSearchParams(params)) {
             return createErrorResponse(1, "参数错误");
         }
 
-            // 解析参数
-            Integer pageNum = params.get("pageNum") != null ? Integer.parseInt(params.get("pageNum")) : 1;
-            Integer pageSize = params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10;
-            String id = params.get("id");
-            String name = params.get("name");
-            Integer status = params.get("status") != null ? Integer.parseInt(params.get("status")) : null;
+        // 解析参数
+        Integer pageNum = params.get("pageNum") != null ? Integer.parseInt(params.get("pageNum")) : 1;
+        Integer pageSize = params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10;
+        String id = params.get("id");
+        String name = params.get("name");
+        Integer status = params.get("status") != null ? Integer.parseInt(params.get("status")) : null;
 
-            // 调用服务层
+        // 调用服务层
         PageResult<Product> pageResult= productService.searchProducts(pageNum, pageSize, id, name, status);
 
         Map<String, Object> result= new HashMap<>();
@@ -212,8 +213,22 @@ public class ProductController {
 
 
 
-    @PostMapping("/getdetail.do/{id}")
-    public ResponseEntity<Product> getProductDetailbyid(@PathVariable("id") int id) {
+    @PostMapping("/product/getdetail.do")
+    public Map<String,Object> getProductDetailbyid(@RequestParam int id) {
+        Map<String,Object> result = new HashMap<>();
+        Product product = productService.getProductDetailbyid(id);
+        if (product == null) {
+            result.put("status", 1);
+            result.put("msg", "商品已下架");
+            return result;
+        }
+        result.put("status", 0);
+        result.put("data", product);
+        return result;
+    }
+
+    @PostMapping("/mgr/product/getdetail.do")
+    public ResponseEntity<Product> getMgrProductDetailbyid(@RequestParam int id) {
         Product product = productService.getProductDetailbyid(id);
         if (product == null) {
             Map<String, String> errorMap = new HashMap<>();
@@ -224,8 +239,7 @@ public class ProductController {
     }
 
 
-
-    @PostMapping("/setstatus.do")
+    @PostMapping("mgr/product/setstatus.do")
     public Map<String, Object> setProductStatus(@RequestBody Map<String, String> params) {
         // 验证参数
         if (params == null) {
@@ -269,22 +283,21 @@ public class ProductController {
 
 
     //商品新增及更新接口
-    @PostMapping("/saveproduct.do")
+    @PostMapping("mgr/product/saveproduct.do")
     public Map<String, Object> saveProduct(@RequestBody Map<String, Object> params) {
-            // 检查必填参数
-            if (!validateProductParams(params)) {
-                return createErrorResponse(1, "缺少必要参数");
-            }
+        // 检查必填参数
+        if (!validateProductParams(params)) {
+            return createErrorResponse(1, "缺少必要参数");
+        }
 
-            // 根据是否有id决定是新增还是更新
-            if (params.containsKey("id") && params.get("id") != null) {
-                return productService.updateProduct(params);
-            } else {
-                return productService.addProduct(params);
-            }
+        // 根据是否有id决定是新增还是更新
+        if (params.containsKey("id") && params.get("id") != null) {
+            return productService.updateProduct(params);
+        } else {
+            return productService.addProduct(params);
+        }
     }
 
-    //商品新增及更新接口
     // 验证商品参数
     private boolean validateProductParams(Map<String, Object> params) {
         String[] requiredFields = {"name", "productId", "partsId", "detail",
@@ -302,12 +315,12 @@ public class ProductController {
 
 
     //首页楼层商品数据接口
-    @PostMapping("/findfloors.do")
+    @PostMapping("product/findfloors.do")
     public Map<String, Object> getFloorProducts() {
         return productService.getFloorProducts();
     }
 
-    @PostMapping("/findhotproducts.do")
+    @PostMapping("product/findhotproducts.do")
     public Map<String, Object> getHotProducts(@RequestBody Map<String, String> params) {
         try {
             // 验证参数
@@ -329,30 +342,63 @@ public class ProductController {
     }
 
 
-    @PostMapping("/findproducts.do")
+    //前台查询商品列表
+    @PostMapping("product/findproducts.do")
     public Map<String, Object> searchProductsByType(@RequestBody Map<String, String> params) {
 
-            // 参数验证
-            if (!validateSearchParams(params)) {
-                return createErrorResponse(1, "参数错误");
+        // 参数验证
+        if (!validateSearchParams(params)) {
+            return createErrorResponse(1, "参数错误");
+        }
+
+        // 解析参数，并提供默认值或处理空值情况
+        Integer pageNum = 1;
+        try {
+            pageNum = Integer.valueOf(params.getOrDefault("pageNum", "1"));
+        } catch (NumberFormatException e) {
+            // 如果pageNum不是有效的数字，使用默认值1
+            pageNum = 1;
+        }
+
+        Integer pageSize = 10;
+        try {
+            pageSize = Integer.valueOf(params.getOrDefault("pageSize", "10"));
+        } catch (NumberFormatException e) {
+            // 如果pageSize不是有效的数字，使用默认值10
+            pageSize = 10;
+        }
+
+        Integer productTypeId = null;
+        try {
+            if (params.containsKey("productTypeId")) {
+                productTypeId = Integer.valueOf(params.get("productTypeId"));
             }
+        } catch (NumberFormatException e) {
+            // 处理productTypeId不是有效数字的情况
+            // 可以根据业务需求决定是设为null还是抛出异常
+        }
 
-            // 解析参数
-            Integer pageNum = Integer.parseInt(params.getOrDefault("pageNum", "1"));
-            Integer pageSize = Integer.parseInt(params.getOrDefault("pageSize", "10"));
-            String productTypeId = params.get("productTypeId");
-            String partsId = params.get("partsId");
-            String name = params.get("name");
+        Integer partsId = null;
+        try {
+            if (params.containsKey("partsId")) {
+                partsId = Integer.valueOf(params.get("partsId"));
+            }
+        } catch (NumberFormatException e) {
+            // 处理partsId不是有效数字的情况
+        }
 
-            // 调用服务层
-            Map<String, Object> result = productService.searchProductsByType(
-                    pageNum, pageSize, productTypeId, partsId, name);
+        String name = params.get("name");  // name可以为null
 
-            // 构建返回格式
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", 0);
-            response.put("data", result);
-            return response;
+        System.out.println( pageNum + "+" + pageSize + "+" + productTypeId + "+" + partsId + "+" + name);
+
+        // 调用服务层
+        Map<String, Object> result = productService.searchProductsByType(pageNum, pageSize, productTypeId, partsId, name);
+
+        // 构建返回格式
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 0);
+        response.put("data", result);
+        return response;
 
     }
 

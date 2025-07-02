@@ -112,9 +112,18 @@ public class OrderServiceImpl implements OrderService {
             item.setUid(uid);
             item.setGoodsId(dto.getProductId());
             item.setQuantity(dto.getQuantity());
+            double price = dto.getPrice();
+            item.setTotalPrice(BigDecimal.valueOf(price));
 
-            Product product = productMapper.getProductDetailbyid(dto.getProductId());
+            Integer id = dto.getProductId();
+            Product product = productMapper.getProductByMainId(id);
+
+            item.setGoodsName(product.getName());
+            item.setPrice(product.getPrice());
+            item.setCreated(LocalDateTime.now());
+            item.setIconUrl(String.valueOf(111));
             // TODO: 设置商品价格、名称等其他属性
+
             orderItems.add(item);
         }
          //TODO: 保存订单和订单项到数据库

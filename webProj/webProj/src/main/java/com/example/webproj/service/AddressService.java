@@ -11,17 +11,9 @@ public interface AddressService {
 
     boolean updateAddress(Address address, Integer uid);
 
-//    List<Address> setDefaultAddress(Long id, Long uid);
-//
-//    List<Address> deleteAddress(Long id, Long uid);
-//
-//    List<Address> saveAddress(Address address, Long uid);
-
-//    Address findAddressById(Integer id, Integer userId);
 
     List<Address> findAddressesByUserId(Integer userId);
 
-//    boolean updateAddress(Address address, Integer userId);
 
     @Transactional
     List<Address> setDefaultAddress(Integer id, Integer userId);
@@ -29,4 +21,5 @@ public interface AddressService {
     List<Address> deleteAddress(Integer id, Integer userId);
 
     List<Address> saveAddress(Address address, Integer userId);
+
 }

@@ -19,9 +19,7 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
-    // 获取当前登录用户ID的方法（假设使用Session存储）
-    // 这里需要实现获取当前登录用户ID的逻辑
-    // 示例中返回固定值，实际中应从session或token中获取
+    // 获取当前登录用户ID的方法
     private Integer getCurrentUserId(HttpSession session) {
         User user = (User) session.getAttribute("user");
         return user.getId();
@@ -158,6 +156,42 @@ public class AddressController {
         result.put("status", 0);
         result.put("data", addresses);
         return result;
+    }
+
+    // 新增地址
+    @PostMapping("/updateaddr.do")
+    public Map<String, Object> updateAddress(@RequestBody Address address,
+                                           HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        Integer uid = getCurrentUserId(session);
+        Integer addressId = address.getId();
+
+        if (uid == null) {
+            result.put("status", 1);
+            result.put("msg", "请登录后在进行操作！");
+            return result;
+        }
+
+        if (address.getName() == null || address.getMobile() == null ||
+                address.getProvince() == null || address.getCity() == null ||
+                address.getDistrict() == null || address.getAddr() == null ||
+                address.getZip() == null) {
+            result.put("status", 1);
+            result.put("msg", "参数错误！");
+            return result;
+        }
+
+        boolean update = addressService.updateAddress(address, uid);
+        if(update) {
+            Address newAddress = addressService.findAddressById(addressId,uid);
+            result.put("status", 0);
+            result.put("data", newAddress);
+            return result;
+        }
+        result.put("status", 1);
+        result.put("msg", "更新失败！");
+        return result;
+
     }
 }
 

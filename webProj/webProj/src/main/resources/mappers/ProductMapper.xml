@@ -5,14 +5,34 @@
 
 
     <select id="getproductbyid"  resultType="com.example.webproj.pojo.Product">
-        SELECT * FROM product
-        WHERE product_id = #{productId}
+        SELECT
+            id,
+            name,
+            product_id  AS productId,
+            parts_id    AS partsId,
+            icon_url    AS iconUrl,
+            sub_images  AS subImages,
+            detail,
+            spec_param  AS specParam,
+            price,
+            stock,
+            status,
+            is_hot AS isHot,
+            created,
+            updated
+        FROM product
+        WHERE id = #{id}
     </select>
 
     <!-- 基础查询（返回Map） -->
     <select id="findAllProducts" resultType="map">
         SELECT * FROM product
         WHERE status = 2
+    </select>
+
+    <select id="getProductByMainId" resultType="com.example.webproj.pojo.Product">
+        SELECT * FROM product
+        WHERE id = #{id}
     </select>
 
     <select id="findProductById" resultType="map">
@@ -101,7 +121,7 @@
         INSERT INTO product (
             name, product_id, parts_id, icon_url, sub_images,
             detail, spec_param, price, stock, status,
-            hot, created, updated
+            is_hot, created, updated
         ) VALUES (
                      #{name}, #{productId}, #{partsId}, #{iconUrl}, #{subImages},
                      #{detail}, #{specParam}, #{price}, #{stock}, #{status},
@@ -163,12 +183,12 @@
         SELECT
         id, name, product_id as productId, parts_id as partsId,
         icon_url as iconUrl, sub_images as subImages, detail,
-        spec_param as specParam, price, stock, status, hot,
+        spec_param as specParam, price, stock, status, is_hot,
         created, updated
         FROM product
         WHERE product_id = #{productId}
         AND status = 2  <!-- 只查询上架商品 -->
-        ORDER BY hot DESC, updated DESC
+        ORDER BY is_hot DESC, updated DESC
         LIMIT 5        <!-- 每层最多5个商品 -->
     </select>
 
@@ -186,54 +206,50 @@
     </select>
 
 
-    <select id="searchProductsByType" resultType="map">
+    <select id="searchProductsByType" parameterType="com.example.webproj.pojo.Product">
         SELECT
-        p.id,
-        p.name,
-        p.price,
-        p.status,
-        CASE p.status
-        WHEN 1 THEN '待售'
-        WHEN 2 THEN '在售'
-        WHEN 3 THEN '下架'
-        END as statusDesc,
-        pt.name as productCategory,
-        pc.name as partsCategory,
-        p.icon_url,
-        p.is_hot,
-        CASE p.is_hot
-        WHEN 1 THEN '热销'
-        ELSE '一般'
-        END as hotStatus
-        FROM product p
-        LEFT JOIN product_type pt ON p.product_id = pt.id
-        LEFT JOIN (SELECT 0 as id, '' as name) pc ON 1=1<!-- 模拟空表 -->
-        WHERE 1=1
-        <if test="productTypeId != null and productTypeId != '0'">
-            AND p.product_id = #{productTypeId}
+        id,
+        name,
+        product_id  AS productId,
+        parts_id    AS partsId,
+        icon_url    AS iconUrl,
+        sub_images  AS subImages,
+        detail,
+        spec_param  AS specParam,
+        price,
+        stock,
+        status,
+        is_hot AS isHot,
+        created,
+        updated
+        FROM product
+        <where>
+        <if test="productTypeId != null and productTypeId != 0">
+            AND product_id = #{productTypeId}
         </if>
-        <if test="partsId != null and partsId != '0'">
-            AND p.parts_id = #{partsId}
+        <if test="partsId != null and partsId != 0">
+            AND parts_id = #{partsId}
         </if>
         <if test="name != null and name != ''">
-            AND p.name LIKE CONCAT('%', #{name}, '%')
+            AND name LIKE CONCAT('%', #{name}, '%')
         </if>
-        ORDER BY p.id DESC
-        LIMIT #{offset}, #{pageSize}
+        </where>
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <select id="countProductsByType" resultType="int">
         SELECT COUNT(*)
-        FROM product p
-        WHERE 1=1
-        <if test="productTypeId != null and productTypeId != '0'">
-            AND p.product_id = #{productTypeId}
-        </if>
-        <if test="partsId != null and partsId != '0'">
-            AND p.parts_id = #{partsId}
-        </if>
-        <if test="name != null and name != ''">
-            AND p.name LIKE CONCAT('%', #{name}, '%')
-        </if>
+        FROM product
+        <where>
+            <if test="productTypeId != null and productTypeId != 0">
+                AND product_id = #{productTypeId}
+            </if>
+            <if test="partsId != null and partsId != 0">
+                AND parts_id = #{partsId}
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
     </select>
 </mapper>

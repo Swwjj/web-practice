@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: #f8f9fa;
+            border-left-color: #667eea;
+        }
+
+        .nav-item.active {
+            background-color: #e3f2fd;
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .content-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .content-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .view-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>后台管理系统</h1>
+        <div class="user-info">
+            <span id="adminName">管理员</span>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="nav-item" id="nav-dashboard" onclick="showDashboard()"><i>📊</i>仪表盘</div>
+            <div class="nav-item" id="nav-user" onclick="showUserManagement()"><i>👥</i>用户管理</div>
+            <div class="nav-item" id="nav-order" onclick="showOrderManagement()"><i>📦</i>订单管理</div>
+            <div class="nav-item" id="nav-product" onclick="location.href='product-management.html'"><i>🛒</i>商品管理</div>
+            <div class="nav-item" id="nav-type" onclick="location.href='product-type-management.html'"><i>📦</i>产品类型管理</div>
+        </div>
+
+        <div class="main-content">
+            <!-- 仪表盘内容 -->
+            <div id="dashboard-content">
+                <div class="content-header">
+                    <h2>仪表盘</h2>
+                    <p>系统概览和统计数据</p>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>总用户数</h3>
+                        <div class="number" id="totalUsers">-</div>
+                        <div class="label">注册用户总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总订单数</h3>
+                        <div class="number" id="totalOrders">-</div>
+                        <div class="label">系统订单总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>今日订单</h3>
+                        <div class="number" id="todayOrders">-</div>
+                        <div class="label">今日新增订单</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>系统状态</h3>
+                        <div class="number" style="color: #27ae60;">正常</div>
+                        <div class="label">系统运行状态</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户管理内容 -->
+            <div id="user-content" class="hidden">
+                <div class="content-header">
+                    <h2>用户管理</h2>
+                    <p>管理系统用户信息</p>
+                </div>
+                <div id="user-management-content">
+                    <button class="btn" onclick="loadUserList()">刷新用户列表</button>
+                    <div id="user-list-container">
+                        <p>点击"刷新用户列表"加载用户数据</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 订单管理内容 -->
+            <div id="order-content" class="hidden">
+                <div class="content-header">
+                    <h2>订单管理</h2>
+                    <p>管理系统订单信息</p>
+                </div>
+                <div id="order-management-content">
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                        <button class="btn" onclick="loadOrderList()">刷新订单列表</button>
+                        <input type="text" id="searchOrderNo" placeholder="请输入订单号" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; max-width: 200px;">
+                        <button class="btn" onclick="searchOrder()">搜索订单</button>
+                    </div>
+                    <div id="order-list-container">
+                        <p>点击"刷新订单列表"加载订单数据</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-dashboard.js"></script>
+</body>
+</html> 

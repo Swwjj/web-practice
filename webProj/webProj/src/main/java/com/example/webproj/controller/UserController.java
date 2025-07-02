@@ -25,11 +25,6 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
-//    @PostMapping("/do_register.do")
-//    public Map<String, Object> register(@RequestBody User user) {
-//        boolean result = userService.register(user);
-//        return result ? success("注册成功！") : error("注册失败！");
-//    }
 
     @PostMapping("/do_register.do")
     public Map<String, Object> register(@RequestBody User user) {
@@ -63,6 +58,7 @@ public class UserController {
         return userService.checkInfo(info, type);
     }
 
+    //普通用户登录
     @PostMapping("/do_login.do")
     public Map<String, Object> do_login(@RequestParam String account, @RequestParam String password, HttpSession session) {
         User user = userService.do_login(account, password);
@@ -79,6 +75,7 @@ public class UserController {
     }
 
 
+    //管理员登录
     @PostMapping("/login.do")
     public Map<String, Object> adminLogin(@RequestParam String account, @RequestParam String password, HttpSession session) {
         User user = userService.login(account, password);

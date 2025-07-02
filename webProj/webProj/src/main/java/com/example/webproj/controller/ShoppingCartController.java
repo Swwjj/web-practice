@@ -120,6 +120,7 @@ public class ShoppingCartController {
         if (userId == null) {
             result.put("status", 1);
             result.put("msg", "请登录后，再查看购物车！");
+
             return result;
         }
 
@@ -141,10 +142,8 @@ public class ShoppingCartController {
     @GetMapping("/findallcarts.do")
     public Map<String, Object> findAllCarts(HttpSession session) {
         // 从Session中获取用户ID
-        //User user = (User) session.getAttribute("user");
-        //Integer userId = user.getId();
-
-        Integer userId = 1;
+        User user = (User) session.getAttribute("user");
+        Integer userId = user.getId();
         // 调用Service获取购物车商品列表
         return shoppingCartService.getCartItems(userId);
     }
@@ -177,3 +176,4 @@ public class ShoppingCartController {
         return shoppingCartService.saveOrUpdateCartItem(userId, productId, quantity);
     }
 }
+

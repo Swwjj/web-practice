@@ -23,7 +23,7 @@ public interface ProductService {
     Map<String, Object> getHotProducts(int num);
 
     Map<String, Object> searchProductsByType(Integer pageNum, Integer pageSize,
-                                             String productTypeId, String partsId,
+                                             Integer productTypeId, Integer partsId,
                                              String name);
 
 }

@@ -17,7 +17,7 @@ public interface OrderMapper {
     List<Order> findOrdersNoPages(@Param("orderNo") Long orderNo);
 
     List<Order> findOrdersPaging(@Param("offset") int offset,
-                                 @Param("size")   int size);
+                                 @Param("pageSize")   int pageSize);
 
     Order getDetailByOrderNo(@Param("orderNo") Long orderNo);
 

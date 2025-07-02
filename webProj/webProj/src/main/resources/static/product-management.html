@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>商品管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f6fa; margin: 0; }
+        .container { max-width: 1200px; margin: 30px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px #0001; padding: 30px; }
+        h1 { color: #4e54c8; }
+        .flex { display: flex; gap: 30px; }
+        .panel { flex: 1; background: #fafbff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 4px #0001; }
+        .panel h2 { font-size: 18px; color: #333; border-left: 4px solid #4e54c8; padding-left: 10px; margin-bottom: 18px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .btn { padding: 8px 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; margin-right: 8px; }
+        .btn-primary { background: linear-gradient(90deg, #4e54c8, #8f94fb); color: #fff; }
+        .btn-danger { background: #ff6b6b; color: #fff; }
+        .btn-warning { background: #ffd43b; color: #333; }
+        .btn-success { background: #51cf66; color: #fff; }
+        .message { margin: 10px 0; padding: 10px; border-radius: 5px; font-weight: bold; }
+        .message.success { background: #d4edda; color: #155724; }
+        .message.error { background: #f8d7da; color: #721c24; }
+        .message.info { background: #d1ecf1; color: #0c5460; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
+        th { background: #f0f4ff; }
+        tr:nth-child(even) { background: #fafbff; }
+        .img-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        .pagination { margin: 15px 0; text-align: center; }
+        .pagination button { margin: 0 3px; }
+        .editor { border: 1px solid #ddd; border-radius: 4px; min-height: 80px; padding: 8px; background: #fff; }
+        .editor img { max-width: 100%; }
+        .status-on { color: #51cf66; font-weight: bold; }
+        .status-off { color: #ff6b6b; font-weight: bold; }
+        @media (max-width: 900px) { .flex { flex-direction: column; } }
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+        .nav-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-left: 3px solid transparent;
+            color: #333;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item:hover {
+            background-color: #f8f9fa;
+            border-left-color: #667eea;
+        }
+        .nav-item.active {
+            background-color: #e3f2fd;
+            border-left-color: #667eea;
+            color: #667eea;
+        }
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+        @media (max-width: 900px) {
+            .main-content { padding: 10px; }
+        }
+        @media (max-width: 700px) {
+            .sidebar { position: static; width: 100%; height: auto; box-shadow: none; }
+            .main-content { margin-left: 0; padding: 10px; }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <div class="nav-item" id="nav-dashboard" onclick="location.href='admin-dashboard.html'"><i>📊</i>仪表盘</div>
+    <div class="nav-item" id="nav-user" onclick="location.href='admin-dashboard.html#user-content'"><i>👥</i>用户管理</div>
+    <div class="nav-item" id="nav-order" onclick="location.href='admin-dashboard.html#order-content'"><i>📦</i>订单管理</div>
+    <div class="nav-item" id="nav-product" onclick="location.href='product-management.html'"><i>🛒</i>商品管理</div>
+    <div class="nav-item" id="nav-type" onclick="location.href='product-type-management.html'"><i>📦</i>产品类型管理</div>
+</div>
+<div class="main-content">
+    <div class="container">
+        <h1>商品管理</h1>
+        <div class="flex">
+            <!-- 商品列表 -->
+            <div class="panel" style="flex:2;">
+                <h2>商品列表</h2>
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="showAddForm()">新增商品</button>
+                    <button class="btn btn-warning" onclick="loadAllProducts()">查询全部(不分页)</button>
+                    <button class="btn btn-primary" onclick="loadPagedProducts()">分页查询</button>
+                </div>
+                <div id="product-message"></div>
+                <table id="product-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th><th>名称</th><th>主图</th><th>状态</th><th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="pagination" id="pagination"></div>
+            </div>
+            <!-- 商品详情/编辑 -->
+            <div class="panel" style="flex:1;" id="product-form-panel" hidden>
+                <h2 id="form-title">新增商品</h2>
+                <form id="product-form" onsubmit="return false;">
+                    <input type="hidden" id="productId">
+                    <div class="form-group">
+                        <label>商品名称</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>主图上传</label>
+                        <input type="file" id="mainImageInput" accept="image/*" onchange="uploadMainImage()">
+                        <img id="mainImagePreview" class="img-thumb" style="display:none;">
+                    </div>
+                    <div class="form-group">
+                        <label>商品描述（富文本）</label>
+                        <div id="editor" class="editor" contenteditable="true"></div>
+                        <input type="file" id="editorImageInput" accept="image/*" style="display:none;" onchange="uploadEditorImage()">
+                        <button class="btn btn-warning" type="button" onclick="document.getElementById('editorImageInput').click()">插入图片</button>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="productStatus">
+                            <option value="1">上架</option>
+                            <option value="0">下架</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-success" onclick="saveProduct()">保存</button>
+                        <button class="btn btn-danger" onclick="hideForm()">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 商品详情模态框 -->
+<div id="product-detail-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+            <h3>商品详情</h3>
+            <span class="close" onclick="closeProductDetailModal()">&times;</span>
+        </div>
+        <div class="form-group">
+            <label>ID：</label>
+            <span id="detailProductId"></span>
+        </div>
+        <div class="form-group">
+            <label>名称：</label>
+            <span id="detailProductName"></span>
+        </div>
+        <div class="form-group">
+            <label>主图：</label>
+            <img id="detailProductImage" class="img-thumb" style="display:none;">
+        </div>
+        <div class="form-group">
+            <label>状态：</label>
+            <span id="detailProductStatus"></span>
+        </div>
+        <div class="form-group">
+            <label>描述：</label>
+            <div id="detailProductDesc" style="background:#fafbff; border-radius:4px; padding:10px; min-height:60px;"></div>
+        </div>
+        <div class="form-group" style="text-align:right;">
+            <button class="btn btn-danger" onclick="closeProductDetailModal()">关闭</button>
+        </div>
+    </div>
+</div>
+<script>
+    const API_BASE = 'http://localhost:8080/actionmall';
+    let currentPage = 1, pageSize = 5, totalPage = 1, allProducts = [];
+    let editingProduct = null;
+
+    // 显示消息
+    function showMsg(msg, type='info') {
+        document.getElementById('product-message').innerHTML = `<div class="message ${type}">${msg}</div>`;
+        setTimeout(()=>{document.getElementById('product-message').innerHTML='';}, 4000);
+    }
+
+    // 商品列表（不分页）
+    async function loadAllProducts() {
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/list.do`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            });
+            const data = await res.json();
+            if(data.status === 0) {
+                allProducts = data.data;
+                renderProductTable(data.data, false);
+            } else {
+                showMsg('查询失败: ' + data.msg, 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+
+    // 商品列表（分页）
+    async function loadPagedProducts(page = 1) {
+        currentPage = page;
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/searchproducts.do`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ pageNum: page, pageSize: pageSize })
+            });
+            const data = await res.json();
+            if(data.status === 0) {
+                const list = data.data.data || data.data.list || [];
+                renderProductTable(list, true, data.data.totalRecord || data.data.total, page);
+            } else {
+                showMsg('查询失败: ' + data.msg, 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+
+    // 渲染商品表格
+    function renderProductTable(list, paged, total=0, page=1) {
+        const tbody = document.querySelector('#product-table tbody');
+        tbody.innerHTML = '';
+        if(!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">暂无数据</td></tr>';
+            document.getElementById('pagination').innerHTML = '';
+            return;
+        }
+        list.forEach(prod => {
+            tbody.innerHTML += `
+            <tr>
+                <td>${prod.id}</td>
+                <td>${prod.name}</td>
+                <td>${prod.mainImage ? `<img src="${prod.mainImage}" class="img-thumb">` : ''}</td>
+                <td>
+                    <span class="${prod.status==1?'status-on':'status-off'}">${prod.status==1?'上架':'下架'}</span>
+                    <button class="btn btn-warning" onclick="toggleStatus(${prod.id},${prod.status==1?2:1})">${prod.status==1?'下架':'上架'}</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary" onclick="showDetail(${prod.id})">详情</button>
+                    <button class="btn btn-success" onclick="editProduct(${prod.id})">编辑</button>
+                </td>
+            </tr>
+        `;
+        });
+        // 分页
+        if(paged) {
+            totalPage = Math.ceil(total/pageSize);
+            let html = '';
+            for(let i=1;i<=totalPage;i++) {
+                html += `<button class="btn ${i==page?'btn-primary':'btn-warning'}" onclick="loadPagedProducts(${i})">${i}</button>`;
+            }
+            document.getElementById('pagination').innerHTML = html;
+        } else {
+            document.getElementById('pagination').innerHTML = '';
+        }
+    }
+
+    // 商品详情（alert方式）
+    async function showDetail(id) {
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/getdetail.do/${id}`, { method: 'POST' });
+            if (!res.ok) {
+                showMsg('商品不存在或已被删除', 'error');
+                return;
+            }
+            const data = await res.json();
+            if(data && (data.status === 0 || data.id)) {
+                const prod = data.data || data;
+                alert(`商品详情：\nID: ${prod.id}\n名称: ${prod.name}\n状态: ${prod.status==1?'上架':'下架'}\n描述: ${prod.detail}`);
+            } else {
+                showMsg('获取详情失败: ' + (data.msg || ''), 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+    function closeProductDetailModal() {
+        document.getElementById('product-detail-modal').classList.remove('show');
+    }
+
+    // 商品状态修改
+    async function toggleStatus(id, status) {
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/setstatus.do`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ productId: id, status: status, hot: 1 })
+            });
+            const data = await res.json();
+            if(data.status === 0) {
+                showMsg('状态修改成功', 'success');
+                loadPagedProducts(currentPage);
+            } else {
+                showMsg('状态修改失败: ' + data.msg, 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+
+    // 新增/编辑商品
+    function showAddForm() {
+        editingProduct = null;
+        document.getElementById('form-title').innerText = '新增商品';
+        document.getElementById('product-form-panel').hidden = false;
+        document.getElementById('product-form').reset();
+        document.getElementById('mainImagePreview').style.display = 'none';
+        document.getElementById('editor').innerHTML = '';
+    }
+    function hideForm() {
+        document.getElementById('product-form-panel').hidden = true;
+    }
+    async function editProduct(id) {
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/getdetail.do/${id}`, { method: 'POST' });
+            if (!res.ok) {
+                showMsg('商品不存在或已被删除', 'error');
+                return;
+            }
+            const data = await res.json();
+            if(data && (data.status === 0 || data.id)) {
+                const prod = data.data || data;
+                editingProduct = prod;
+                document.getElementById('form-title').innerText = '编辑商品';
+                document.getElementById('product-form-panel').hidden = false;
+                document.getElementById('productId').value = prod.id;
+                document.getElementById('productName').value = prod.name;
+                document.getElementById('mainImagePreview').src = prod.mainImage || '';
+                document.getElementById('mainImagePreview').style.display = prod.mainImage ? 'inline-block' : 'none';
+                document.getElementById('editor').innerHTML = prod.detail || '';
+                document.getElementById('productStatus').value = prod.status;
+            } else {
+                showMsg('获取商品信息失败: ' + (data.msg || ''), 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+    async function saveProduct() {
+        const id = document.getElementById('productId').value;
+        const name = document.getElementById('productName').value.trim();
+        const mainImage = document.getElementById('mainImagePreview').src || '';
+        const detail = document.getElementById('editor').innerHTML;
+        const status = document.getElementById('productStatus').value;
+        if(!name) { showMsg('请输入商品名称', 'error'); return; }
+        try {
+            const url = `${API_BASE}/mgr/product/saveproduct.do`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({id, name, mainImage, detail, status})
+            });
+            const data = await res.json();
+            if(data.status === 0) {
+                showMsg('保存成功', 'success');
+                hideForm();
+                loadPagedProducts(currentPage);
+            } else {
+                showMsg('保存失败: ' + data.msg, 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+
+    // 主图上传
+    async function uploadMainImage() {
+        const fileInput = document.getElementById('mainImageInput');
+        if(fileInput.files.length === 0) return;
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/upload.do`, { method: 'POST', body: formData });
+            const data = await res.json();
+            if(data.status === 0 && data.data && data.data.url) {
+                document.getElementById('mainImagePreview').src = data.data.url;
+                document.getElementById('mainImagePreview').style.display = 'inline-block';
+                showMsg('图片上传成功', 'success');
+            } else {
+                showMsg('图片上传失败: ' + (data.msg || '未知错误'), 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+
+    // 富文本图片上传
+    async function uploadEditorImage() {
+        const fileInput = document.getElementById('editorImageInput');
+        if(fileInput.files.length === 0) return;
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        try {
+            const res = await fetch(`${API_BASE}/mgr/product/upload.do`, { method: 'POST', body: formData });
+            const data = await res.json();
+            if(data.status === 0 && data.data && data.data.url) {
+                // 插入图片到富文本
+                const img = document.createElement('img');
+                img.src = data.data.url;
+                document.getElementById('editor').appendChild(img);
+                showMsg('图片插入成功', 'success');
+            } else {
+                showMsg('图片上传失败: ' + (data.msg || '未知错误'), 'error');
+            }
+        } catch(e) { showMsg('网络错误: ' + e.message, 'error'); }
+    }
+
+    // 页面初始化
+    loadPagedProducts();
+
+    // 高亮当前页面
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    if (path.includes('admin-dashboard.html') && (!hash || hash === '#dashboard-content')) {
+        document.getElementById('nav-dashboard').classList.add('active');
+    } else if (path.includes('admin-dashboard.html') && hash === '#user-content') {
+        document.getElementById('nav-user').classList.add('active');
+    } else if (path.includes('admin-dashboard.html') && hash === '#order-content') {
+        document.getElementById('nav-order').classList.add('active');
+    } else if (path.includes('product-management.html')) {
+        document.getElementById('nav-product').classList.add('active');
+    } else if (path.includes('product-type-management.html')) {
+        document.getElementById('nav-type').classList.add('active');
+    }
+</script>
+</body>
+</html> 

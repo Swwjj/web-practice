@@ -46,7 +46,9 @@ public interface ProductMapper {
             @Param("hot") Integer hot
     );
 
-    Product getproductbyid(int productId);
+    Product getproductbyid(int id);
+
+    Product getProductByMainId(int productId);
 
     // 插入商品
     int insertProduct(Product product);
@@ -69,16 +71,16 @@ public interface ProductMapper {
     List<Map<String, Object>> findHotProducts(@Param("limit") int limit);
 
     //商品分页列表接口
-    List<Map<String, Object>> searchProductsByType(
-            @Param("productTypeId") String productTypeId,
-            @Param("partsId") String partsId,
+    List<Product> searchProductsByType(
+            @Param("productTypeId") Integer productTypeId,
+            @Param("partsId") Integer partsId,
             @Param("name") String name,
             @Param("offset") int offset,
             @Param("pageSize") int pageSize);
 
     int countProductsByType(
-            @Param("productTypeId") String productTypeId,
-            @Param("partsId") String partsId,
+            @Param("productTypeId") Integer productTypeId,
+            @Param("partsId") Integer partsId,
             @Param("name") String name);
 
     List<Map<String, Object>> findProductsByCategoryType(Integer type);
