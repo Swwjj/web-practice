@@ -70,9 +70,6 @@
             <button class="add-to-cart-btn" @click="addToCart" :disabled="product.stock <= 0">
               {{ product.stock > 0 ? '加入购物车' : '已售罄' }}
             </button>
-            <button class="buy-now-btn" @click="buyNow" :disabled="product.stock <= 0">
-              {{ product.stock > 0 ? '立即购买' : '已售罄' }}
-            </button>
           </div>
         </div>
       </div>

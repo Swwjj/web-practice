@@ -166,7 +166,7 @@ function updateNavActive(activeItem) {
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th style="display:none;">ID</th>
                             <th>账号</th>
                             <th>姓名</th>
                             <th>邮箱</th>
@@ -182,7 +182,7 @@ function updateNavActive(activeItem) {
             users.forEach(user => {
                 html += `
                     <tr>
-                        <td>${user.id}</td>
+                        <td style="display:none;">${user.id}</td>
                         <td>${user.account}</td>
                         <td>${user.name || '-'}</td>
                         <td>${user.email || '-'}</td>
@@ -681,7 +681,7 @@ function displayProductList(pageData) {
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="display:none;">ID</th>
                     <th>名称</th>
                     <th>价格</th>
                     <th>库存</th>
@@ -714,18 +714,19 @@ function displayProductList(pageData) {
         
         html += `
             <tr>
-                <td>${product.id}</td>
+                <td style="display:none;">${product.id}</td>
                 <td>${product.name || '-'}</td>
                 <td>${product.price || '-'}</td>
                 <td>${product.stock || '-'}</td>
                 <td>${product.status === 2 ? '上架' : '下架'}</td>
                 <td>${typeName}</td>
-                <td>${isHot} <button onclick="toggleProductHot(${product.id},${product.isHot})" class="btn" style="padding:5px 10px;font-size:12px;">${hotBtnText}</button></td>
+                <td>${isHot}</td>
                 <td>${product.detail ? product.detail.replace(/<[^>]+>/g, '').slice(0, 40) : '-'}</td>
                 <td>
                     <button onclick="editProduct(${product.id})" class="view-btn">编辑</button>
                     <button onclick="deleteProduct(${product.id})" class="delete-btn">删除</button>
                     <button onclick="toggleProductStatus(${product.id},${product.status})" class="btn" style="padding:5px 10px;font-size:12px;">${product.status === 2 ? '下架' : '上架'}</button>
+                    <button onclick="toggleProductHot(${product.id},${product.isHot})" class="btn" style="padding:5px 10px;font-size:12px;">${hotBtnText}</button>
                 </td>
             </tr>
         `;
@@ -801,12 +802,23 @@ function toggleProductStatus(id, status) {
 }
 
 function toggleProductHot(id, isHot) {
-    // 只切换热销状态，保持status不变
+    // 获取当前商品的status
+    const row = Array.from(document.querySelectorAll('#product-list-container tr')).find(tr => {
+        const idCell = tr.querySelector('td[style*="display:none"]');
+        return idCell && idCell.textContent == id;
+    });
+    let status = 2; // 默认上架
+    if (row) {
+        const statusCell = row.querySelector('td:nth-child(5)');
+        if (statusCell) {
+            status = statusCell.textContent.trim() === '上架' ? 2 : 1;
+        }
+    }
     const newHot = isHot === 1 ? 2 : 1;
     fetch('http://localhost:8080/actionmall/mgr/product/setstatus.do', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: id, hot: newHot, status: null })
+        body: JSON.stringify({ id: id.toString(), hot: newHot, status: status.toString() })
     })
     .then(response => response.json())
     .then(data => {
@@ -1189,7 +1201,7 @@ function displayTypeList(types) {
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="display:none;">ID</th>
                     <th>类型名称</th>
                     <th>父类型</th>
                     <th>操作</th>
@@ -1205,7 +1217,7 @@ function displayTypeList(types) {
         
         html += `
             <tr>
-                <td>${type.id}</td>
+                <td style="display:none;">${type.id}</td>
                 <td>${type.name || '-'}</td>
                 <td>${parentName}</td>
                 <td>

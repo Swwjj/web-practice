@@ -262,8 +262,7 @@ public class ProductController {
 
         if (hot == null || (hot != 1 && hot != 2)) {
             hot=2;
-        }else
-            hot=1;
+        }
 
         // 调用服务层更新状态
         return productService.updateProductStatus(productId, status, hot);
