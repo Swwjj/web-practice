@@ -22,7 +22,7 @@ public interface ProductMapper {
 
     // 分页查询商品
     List<Product> searchProductsWithCategory(
-            @Param("id") String id,
+            @Param("id") Integer id,
             @Param("name") String name,
             @Param("status") Integer status,
             @Param("offset") int offset,
@@ -31,7 +31,7 @@ public interface ProductMapper {
 
     // 查询总记录数
     int countProducts(
-            @Param("id") String id,
+            @Param("id") Integer id,
             @Param("name") String name,
             @Param("status") Integer status
     );

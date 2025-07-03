@@ -3,7 +3,16 @@
 <mapper namespace="com.example.webproj.mappers.ProductTypeMapper">
 
     <select id="findAll" resultType="com.example.webproj.pojo.ProductType">
-        SELECT * FROM product_type WHERE status = 1 ORDER BY sort_order
+        SELECT
+            id,
+            parent_id as parentId,
+            name,
+            sort_order as sortOrder,
+            status,
+            level,
+            created,
+            updated
+        FROM product_type WHERE status = 1 ORDER BY sort_order
     </select>
 
     <select id="countChildren" parameterType="int" resultType="int">
@@ -19,19 +28,58 @@
     </delete>
 
     <select id="findPathParam" resultType="com.example.webproj.pojo.ProductType">
-        SELECT * FROM product_type WHERE level > 0 AND status = 1
+        SELECT
+            id,
+            parent_id as parentId,
+            name,
+            sort_order as sortOrder,
+            status,
+            level,
+            created,
+            updated
+        FROM product_type WHERE level > 0 AND status = 1
     </select>
 
     <select id="findPartsType" resultType="com.example.webproj.pojo.ProductType" parameterType="int">
-        SELECT * FROM product_type WHERE parent_id = #{productTypeId} AND status = 1
+        SELECT
+            id,
+            parent_id as parentId,
+            name,
+            sort_order as sortOrder,
+            status,
+            level,
+            created,
+            updated
+        FROM product_type WHERE parent_id = #{productTypeId} AND status = 1
     </select>
 
     <select id="findPType" resultType="com.example.webproj.pojo.ProductType">
-        SELECT * FROM product_type WHERE parent_id = 0 AND status = 1
+        SELECT
+            id,
+            parent_id as parentId,
+            name,
+            sort_order as sortOrder,
+            status,
+            level,
+            created,
+            updated
+        FROM product_type
+        WHERE
+#           parent_id = 0
+            status = 1
     </select>
 
     <select id="findChildren" resultType="com.example.webproj.pojo.ProductType" parameterType="int">
-        SELECT * FROM product_type WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order
+        SELECT
+            id,
+            parent_id as parentId,
+            name,
+            sort_order as sortOrder,
+            status,
+            level,
+            created,
+            updated
+        FROM product_type WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order
     </select>
 
     <update id="update" parameterType="com.example.webproj.pojo.ProductType">
@@ -46,6 +94,15 @@
     </insert>
 
     <select id="selectById" resultType="com.example.webproj.pojo.ProductType">
-        SELECT * FROM product_type WHERE id = #{id}
+        SELECT
+            id,
+            parent_id as parentId,
+            name,
+            sort_order as sortOrder,
+            status,
+            level,
+            created,
+            updated
+            FROM product_type WHERE id = #{id}
     </select>
 </mapper>

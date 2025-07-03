@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface ProductService {
     Map<String, Object> getProductList(String id);
-    PageResult<Product> searchProducts(Integer pageNum, Integer pageSize, String id, String name, Integer status);
+    PageResult<Product> searchProducts(Integer pageNum, Integer pageSize, Integer id, String name, Integer status);
     Map<String, Object> getProductDetail(Integer productId);
     public Product getProductDetailbyid(int productId);
     Map<String, Object> updateProductStatus(Integer productId, Integer status, Integer hot);

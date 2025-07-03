@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResult<Product> searchProducts(Integer pageNum, Integer pageSize, String id, String name, Integer status) {
+    public PageResult<Product> searchProducts(Integer pageNum, Integer pageSize, Integer id, String name, Integer status) {
         // 查询总记录数
         int total = productMapper.countProducts(id, name, status);
         // 计算偏移量

@@ -37,7 +37,7 @@
 
     <select id="findProductById" resultType="map">
         SELECT * FROM product
-            WHERE product_id = #{id}
+            WHERE id = #{id}
     </select>
 
     <!-- 关联查询优化字段选择 -->
@@ -65,19 +65,24 @@
     <!-- 分页查询 -->
     <select id="searchProductsWithCategory" resultType="com.example.webproj.pojo.Product">
         SELECT
-        p.id,
-        p.name,
-        p.price,
-        p.status,
-        pt.name,
-        p.icon_url as iconUrl,
-        p.is_hot as isHot
+        id,
+        name,
+        product_id  AS productId,
+        parts_id    AS partsId,
+        icon_url    AS iconUrl,
+        sub_images  AS subImages,
+        detail,
+        spec_param  AS specParam,
+        price,
+        stock,
+        status,
+        is_hot AS isHot,
+        created,
+        updated
         FROM
-            product p
-                LEFT JOIN
-            product_type pt ON p.parts_id=pt.id
+            product
         WHERE 1=1
-        <if test="id != null and id != ''">
+        <if test="id != null and id != null">
             AND p.id = #{id}
         </if>
         <if test="name != null and name != ''">
@@ -86,8 +91,7 @@
         <if test="status != null">
             AND p.status = #{status}
         </if>
-        ORDER BY p.id DESC
-        LIMIT #{offset}, #{pageSize}
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- 查询总数 -->
@@ -95,7 +99,7 @@
         SELECT COUNT(*)
         FROM product p
         WHERE 1=1
-        <if test="id != null and id != ''">
+        <if test="id != null and id != null">
             AND p.id = #{id}
         </if>
         <if test="name != null and name != ''">
@@ -113,7 +117,7 @@
             status = #{status},
             is_hot = #{hot},
             updated = NOW()
-        WHERE product_id = #{productId}
+        WHERE id = #{productId}
     </update>
 
 
@@ -189,7 +193,7 @@
         WHERE product_id = #{productId}
         AND status = 2  <!-- 只查询上架商品 -->
         ORDER BY is_hot DESC, updated DESC
-        LIMIT 5        <!-- 每层最多5个商品 -->
+        LIMIT 4        <!-- 每层最多5个商品 -->
     </select>
 
 

@@ -214,8 +214,8 @@
             <div class="nav-item" id="nav-dashboard" onclick="showDashboard()"><i>📊</i>仪表盘</div>
             <div class="nav-item" id="nav-user" onclick="showUserManagement()"><i>👥</i>用户管理</div>
             <div class="nav-item" id="nav-order" onclick="showOrderManagement()"><i>📦</i>订单管理</div>
-            <div class="nav-item" id="nav-product" onclick="location.href='product-management.html'"><i>🛒</i>商品管理</div>
-            <div class="nav-item" id="nav-type" onclick="location.href='product-type-management.html'"><i>📦</i>产品类型管理</div>
+            <div class="nav-item" id="nav-product" onclick="showProductManagement()"><i>🛒</i>商品管理</div>
+            <div class="nav-item" id="nav-type" onclick="showTypeManagement()"><i>📦</i>产品类型管理</div>
         </div>
 
         <div class="main-content">
@@ -278,6 +278,36 @@
                     </div>
                     <div id="order-list-container">
                         <p>点击"刷新订单列表"加载订单数据</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 商品管理内容 -->
+            <div id="product-content" class="hidden">
+                <div class="content-header">
+                    <h2>商品管理</h2>
+                    <p>管理系统商品信息</p>
+                </div>
+                <div id="product-management-content">
+                    <button class="btn" onclick="loadProductList()">刷新商品列表</button>
+                    <button class="btn" onclick="showAddProductModal()">添加商品</button>
+                    <input type="text" id="searchProductName" placeholder="请输入商品名称" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; max-width: 200px;">
+                    <button class="btn" onclick="searchProduct()">搜索商品</button>
+                    <div id="product-list-container">
+                        <p>点击"刷新商品列表"加载商品数据</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 产品类型管理内容 -->
+            <div id="type-content" class="hidden">
+                <div class="content-header">
+                    <h2>产品类型管理</h2>
+                    <p>管理系统产品类型信息</p>
+                </div>
+                <div id="type-management-content">
+                    <button class="btn" onclick="loadTypeList()">刷新类型列表</button>
+                    <button class="btn" onclick="showAddTypeModal()">添加类型</button>
+                    <div id="type-list-container">
+                        <p>点击"刷新类型列表"加载类型数据</p>
                     </div>
                 </div>
             </div>

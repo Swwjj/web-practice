@@ -159,7 +159,7 @@ public class ProductController {
         // 解析参数
         Integer pageNum = params.get("pageNum") != null ? Integer.parseInt(params.get("pageNum")) : 1;
         Integer pageSize = params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10;
-        String id = params.get("id");
+        Integer id = params.get("id") != null ?Integer.valueOf(params.get("id")):null;
         String name = params.get("name");
         Integer status = params.get("status") != null ? Integer.parseInt(params.get("status")) : null;
 
@@ -247,7 +247,7 @@ public class ProductController {
         }
 
         // 解析参数
-        Integer productId = parseInteger(params.get("productId"));
+        Integer productId = parseInteger(params.get("id"));
         Integer status = parseInteger(params.get("status"));
         Integer hot = parseInteger(params.get("hot"));
 
@@ -261,8 +261,9 @@ public class ProductController {
         }
 
         if (hot == null || (hot != 1 && hot != 2)) {
-            return createErrorResponse(1, "非法热销参数！");
-        }
+            hot=2;
+        }else
+            hot=1;
 
         // 调用服务层更新状态
         return productService.updateProductStatus(productId, status, hot);
@@ -285,10 +286,6 @@ public class ProductController {
     //商品新增及更新接口
     @PostMapping("mgr/product/saveproduct.do")
     public Map<String, Object> saveProduct(@RequestBody Map<String, Object> params) {
-        // 检查必填参数
-        if (!validateProductParams(params)) {
-            return createErrorResponse(1, "缺少必要参数");
-        }
 
         // 根据是否有id决定是新增还是更新
         if (params.containsKey("id") && params.get("id") != null) {
@@ -300,8 +297,7 @@ public class ProductController {
 
     // 验证商品参数
     private boolean validateProductParams(Map<String, Object> params) {
-        String[] requiredFields = {"name", "productId", "partsId", "detail",
-                "specParam", "price", "stock", "subImages"};
+        String[] requiredFields = {"name", "productId", "partsId", "detail", "price", "stock"};
 
         for (String field : requiredFields) {
             Object value = params.get(field);
