@@ -256,4 +256,9 @@
             </if>
         </where>
     </select>
+
+    <!-- 删除商品 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM product WHERE id = #{id}
+    </delete>
 </mapper>

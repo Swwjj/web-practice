@@ -63,6 +63,8 @@ public interface ProductMapper {
 
     int updateProductFromMap(Map<String, Object> params);
 
+    // 删除商品
+    int deleteById(@Param("id") Integer id);
 
     //首页楼层商品数据接口
     List<Map<String, Object>> findByProductId(@Param("productId") int productId);

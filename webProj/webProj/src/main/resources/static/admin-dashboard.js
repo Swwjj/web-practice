@@ -687,6 +687,7 @@ function displayProductList(pageData) {
                     <th>库存</th>
                     <th>状态</th>
                     <th>商品类型</th>
+                    <th>是否热销</th>
                     <th>描述</th>
                     <th>操作</th>
                 </tr>
@@ -707,6 +708,9 @@ function displayProductList(pageData) {
                 typeName = `无效ID(${product.productId})`;
             }
         }
+        // 是否热销
+        const isHot = product.isHot === 1 ? '是' : '否';
+        const hotBtnText = product.isHot === 1 ? '取消热销' : '设为热销';
         
         html += `
             <tr>
@@ -716,6 +720,7 @@ function displayProductList(pageData) {
                 <td>${product.stock || '-'}</td>
                 <td>${product.status === 2 ? '上架' : '下架'}</td>
                 <td>${typeName}</td>
+                <td>${isHot} <button onclick="toggleProductHot(${product.id},${product.isHot})" class="btn" style="padding:5px 10px;font-size:12px;">${hotBtnText}</button></td>
                 <td>${product.detail ? product.detail.replace(/<[^>]+>/g, '').slice(0, 40) : '-'}</td>
                 <td>
                     <button onclick="editProduct(${product.id})" class="view-btn">编辑</button>
@@ -791,6 +796,28 @@ function toggleProductStatus(id, status) {
     })
     .catch(error => {
         console.error('商品上下架失败:', error);
+        alert('网络错误，请稍后重试');
+    });
+}
+
+function toggleProductHot(id, isHot) {
+    // 只切换热销状态，保持status不变
+    const newHot = isHot === 1 ? 2 : 1;
+    fetch('http://localhost:8080/actionmall/mgr/product/setstatus.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: id, hot: newHot, status: null })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 0) {
+            loadProductList();
+        } else {
+            alert('操作失败: ' + data.msg);
+        }
+    })
+    .catch(error => {
+        console.error('商品热销状态切换失败:', error);
         alert('网络错误，请稍后重试');
     });
 }
@@ -872,6 +899,14 @@ function showProductModal(product) {
                 <input type="text" id="productName" value="${product?.name || ''}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
             </div>
             <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">商品图片:</label>
+                <input type="file" id="productImage" accept="image/*" style="width: 100%;">
+                <input type="hidden" id="productIconUrl" value="${product?.iconUrl || ''}">
+                <div id="productImagePreview" style="margin-top:8px;">
+                    ${product?.iconUrl ? `<img src="${product.iconUrl}" style="width:60px;height:60px;object-fit:cover;">` : ''}
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">顶级类型:</label>
                 <select id="parentTypeSelect" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                     <option value="">正在加载顶级类型...</option>
@@ -880,7 +915,7 @@ function showProductModal(product) {
             <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">子类型:</label>
                 <select id="childTypeSelect" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    ${childTypeOptions}
+                    <option value="">请先选择顶级类型</option>
                 </select>
             </div>
             <div style="margin-bottom: 15px;">
@@ -905,12 +940,37 @@ function showProductModal(product) {
     modal.appendChild(content);
     document.body.appendChild(modal);
     
+    // 图片上传事件
+    document.getElementById('productImage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        fetch('http://localhost:8080/actionmall/mgr/product/upload.do', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 0 && data.data && data.data.url) {
+                document.getElementById('productIconUrl').value = data.data.url;
+                document.getElementById('productImagePreview').innerHTML = `<img src="${data.data.url}" style="width:60px;height:60px;object-fit:cover;">`;
+            } else {
+                alert('图片上传失败: ' + (data.msg || '未知错误'));
+            }
+        })
+        .catch(() => {
+            alert('图片上传失败');
+        });
+    });
+    
     // 添加顶级类型选择事件
     document.getElementById('parentTypeSelect').addEventListener('change', function() {
         const parentId = this.value;
         const childSelect = document.getElementById('childTypeSelect');
         
-        console.log('选择的顶级类型ID:', parentId);
+        console.log('选择的顶级类型ID:', parentId, '名称:', productTypeMap.get(parseInt(parentId)));
+        console.log('当前商品类型映射表:', productTypeMap);
         
         if (parentId) {
             // 从后端获取子类型数据
@@ -946,6 +1006,13 @@ function showProductModal(product) {
         } else {
             childSelect.innerHTML = '<option value="">请先选择顶级类型</option>';
         }
+    });
+    
+    // 添加子类型选择事件
+    document.getElementById('childTypeSelect').addEventListener('change', function() {
+        const childId = this.value;
+        console.log('选择的子类型ID:', childId, '名称:', productTypeMap.get(parseInt(childId)));
+        console.log('当前商品类型映射表:', productTypeMap);
     });
     
     // 如果是编辑模式，设置当前选中的类型
@@ -995,25 +1062,40 @@ function showProductModal(product) {
     document.getElementById('productForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const name = document.getElementById('productName').value;
-        const productId = document.getElementById('childTypeSelect').value;
+        // productId为顶级类型ID，partsId为子类型ID
+        const productIdRaw = document.getElementById('parentTypeSelect').value;
+        const productId = productIdRaw === '' ? null : parseInt(productIdRaw);
+        const partsIdRaw = document.getElementById('childTypeSelect').value;
+        const partsId = partsIdRaw === '' ? null : parseInt(partsIdRaw);
         const price = document.getElementById('productPrice').value;
         const stock = document.getElementById('productStock').value;
         const detail = document.getElementById('productDetail').value;
+        const iconUrl = document.getElementById('productIconUrl').value || '';
         // 隐藏字段
-        const partsId = document.getElementById('productPartsId').value || '';
         const specParam = document.getElementById('productSpecParam').value || '';
-        const subImages = document.getElementById('productSubImages').value || '';
-        const productTypeId = document.getElementById('productProductTypeId').value || '';
+        let subImages = document.getElementById('productSubImages').value || '';
+        // 如果subImages为空，则用iconUrl
+        if (!subImages && iconUrl) {
+            subImages = iconUrl;
+        }
+        const productTypeIdRaw = document.getElementById('productProductTypeId').value || '';
+        const productTypeId = productTypeIdRaw === '' ? null : parseInt(productTypeIdRaw);
+        // 调试：打印最终要提交的类型ID和名称
+        console.log('提交商品时的顶级类型ID:', productId, '名称:', productTypeMap.get(productId));
+        console.log('提交商品时的子类型ID:', partsId, '名称:', productTypeMap.get(partsId));
+        console.log('提交商品时的图片地址:', iconUrl);
+        console.log('提交商品时的subImages:', subImages);
         saveProduct({
             id: product?.id,
             name,
-            productId,
+            productId,   // 顶级类型ID
             price,
             stock,
             detail,
-            partsId,
+            partsId,     // 子类型ID
+            iconUrl,     // 商品图片
             specParam,
-            subImages,
+            subImages,   // 商品图片也作为subImages
             productTypeId
         });
     });

@@ -292,4 +292,23 @@ public class ProductServiceImpl implements ProductService {
 
         return result;
     }
+
+    @Override
+    public Map<String, Object> deleteProduct(Integer id) {
+        Map<String, Object> result = new HashMap<>();
+        if (id == null || id <= 0) {
+            result.put("status", 1);
+            result.put("msg", "商品ID不能为空");
+            return result;
+        }
+        int affectedRows = productMapper.deleteById(id);
+        if (affectedRows > 0) {
+            result.put("status", 0);
+            result.put("msg", "删除成功");
+        } else {
+            result.put("status", 1);
+            result.put("msg", "删除失败，商品不存在");
+        }
+        return result;
+    }
 }

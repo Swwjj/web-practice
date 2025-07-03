@@ -21,7 +21,7 @@ import com.example.webproj.pojo.OrderItemDto;
 public class OrderController {
 
     private final OrderService orderService;
-    private final HttpSession  session;          // 简化示例，用 session 存 当前用户信息
+    private final HttpSession  session;          //用 session 存 当前用户信息
 
     public OrderController(OrderService orderService, HttpSession session) {
         this.orderService = orderService;

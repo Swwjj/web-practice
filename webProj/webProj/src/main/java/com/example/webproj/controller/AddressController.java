@@ -158,7 +158,7 @@ public class AddressController {
         return result;
     }
 
-    // 新增地址
+    // 修改地址
     @PostMapping("/updateaddr.do")
     public Map<String, Object> updateAddress(@RequestBody Address address,
                                            HttpSession session) {

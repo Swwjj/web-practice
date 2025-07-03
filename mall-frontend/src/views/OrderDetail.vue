@@ -33,7 +33,7 @@
               <img :src="item.iconUrl || '/default-product.png'" :alt="item.goodsName" class="product-img" />
               <span>{{ item.goodsName }}</span>
             </td>
-            <td>¥{{ item.curPrice }}</td>
+            <td>¥{{ item.price }}</td>
             <td>{{ item.quantity }}</td>
             <td>¥{{ item.totalPrice }}</td>
           </tr>

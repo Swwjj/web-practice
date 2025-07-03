@@ -26,4 +26,7 @@ public interface ProductService {
                                              Integer productTypeId, Integer partsId,
                                              String name);
 
+    // 删除商品
+    Map<String, Object> deleteProduct(Integer id);
+
 }

@@ -176,7 +176,7 @@ export function deleteCartItem(productId) {
   return request({
     url: '/cart/delcarts.do',
     method: 'post',
-    data: { productId }
+    params: { productId }
   });
 }
 

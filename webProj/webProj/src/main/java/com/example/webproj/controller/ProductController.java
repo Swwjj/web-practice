@@ -398,4 +398,18 @@ public class ProductController {
 
     }
 
+    // 删除商品接口
+    @PostMapping("/mgr/product/delproduct.do")
+    public Map<String, Object> deleteProduct(@RequestBody Map<String, Object> params) {
+        Integer id = null;
+        if (params.get("id") != null) {
+            try {
+                id = Integer.parseInt(params.get("id").toString());
+            } catch (NumberFormatException e) {
+                return createErrorResponse(1, "商品ID格式错误");
+            }
+        }
+        return productService.deleteProduct(id);
+    }
+
 }
